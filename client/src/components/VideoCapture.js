@@ -9,16 +9,10 @@ const VideoCapture = () => {
     // LOAD FROM USEEFFECT
 
     useEffect(() => {
-        console.log("USEEFFECT BEFORE MODELS");
         videoRef && loadModels();
-        // console.log("USEEFFECT AFTER MODELS")
-        // startVideo();
-        // console.log("USEEFFECT AFTER VIDEO")
-        // faceMyDetect();
-        // console.log("USEEFFECT AFTER DETECTION")
     }, []);
 
-    // OPEN FACE WEBCAM
+    // OPEN WEBCAM
     const startVideo = () => {
         navigator.mediaDevices
             .getUserMedia({ video: true, audio: false })
@@ -29,34 +23,29 @@ const VideoCapture = () => {
                 console.error(error);
             });
     };
+
     // LOAD MODELS FROM FACE API
 
     const loadModels = () => {
-        console.log("BEFORE MODELS DOWNLOADED INSIDE MODELS");
         Promise.all([
-            // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
-            faceapi.nets.faceExpressionNet.loadFromUri("/weights"),
+            // LOAD THE MODELS
+            faceapi.nets.faceExpressionNet.loadFromUri("/models"),
 
-            faceapi.nets.ssdMobilenetv1.loadFromUri("/weights"), //("../../public/weights")
-            faceapi.nets.faceRecognitionNet.loadFromUri("/weights"),
-            faceapi.nets.faceLandmark68Net.loadFromUri("/weights"),
+            faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+            faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+            faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
         ])
             .then(() => {
-                console.log("AFTER MODELS DOWNLOADED INSIDE MODELS");
-                // faceMyDetect();
-                console.log("BEFORE STARTING VIDEO INSIDE MODELS");
                 startVideo();
-                console.log("AFTER STARTING VIDEO INSODE MODELS");
             })
             .then(() => {
-                console.log("BEFORE FACE DETECTION INSIDE MODELS");
                 faceMyDetect();
-                console.log("AFTER FACE DETECTION INSIDE MODELS");
             });
     };
 
+    //GET DESCRIPTIONS FOR ALL USERS
     function getLabeledFaceDescriptions() {
-        const labels = ["Alex"];
+        const labels = ["Alex", "Yulia"];
         return Promise.all(
             labels.map(async (label) => {
                 const descriptions = [];
@@ -75,25 +64,22 @@ const VideoCapture = () => {
         );
     }
 
+    // RECOGNITION
     const faceMyDetect = async () => {
         //LOADING DATA
 
         const labeledFaceDescriptors = await getLabeledFaceDescriptions();
         const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-        console.log("videoRef.current=>", videoRef.current);
+
         const displaySize = {
             width: videoRef.current.offsetWidth,
             height: videoRef.current.offsetHeight,
         };
-        faceapi.matchDimensions(canvasRef.current, displaySize);
 
         setInterval(async () => {
-
-
+            faceapi.matchDimensions(canvasRef.current, displaySize);
             const detections = await faceapi
-                .detectAllFaces(
-                    videoRef.current,
-                )
+                .detectAllFaces(videoRef.current)
                 .withFaceLandmarks()
                 .withFaceDescriptors();
 
@@ -116,15 +102,21 @@ const VideoCapture = () => {
             const results = resizedDetections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor);
             });
-            console.log("RESULTS", results)
+            console.log("RESULTS", results);
             results.forEach((result, i) => {
+                // dots
+                faceapi.draw.drawFaceLandmarks(
+                    canvasRef.current,
+                    resizedDetections
+                );
+                // box
                 const box = resizedDetections[i].detection.box;
                 const drawBox = new faceapi.draw.DrawBox(box, {
                     label: result,
                 });
                 drawBox.draw(canvasRef.current);
             });
-        }, 500);
+        }, 1000);
     };
 
     return (
