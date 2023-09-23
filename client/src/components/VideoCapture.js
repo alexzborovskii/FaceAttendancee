@@ -29,8 +29,6 @@ const VideoCapture = () => {
     const loadModels = () => {
         Promise.all([
             // LOAD THE MODELS
-            faceapi.nets.faceExpressionNet.loadFromUri("/models"),
-
             faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
             faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
             faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
@@ -67,7 +65,6 @@ const VideoCapture = () => {
     // RECOGNITION
     const faceMyDetect = async () => {
         //LOADING DATA
-
         const labeledFaceDescriptors = await getLabeledFaceDescriptions();
         const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
 
@@ -76,8 +73,11 @@ const VideoCapture = () => {
             height: videoRef.current.offsetHeight,
         };
 
-        setInterval(async () => {
-            faceapi.matchDimensions(canvasRef.current, displaySize);
+        const detInt = setInterval(async () => {
+            if (!canvasRef.current ) {
+                clearInterval(detInt);
+            }
+            canvasRef.current && faceapi.matchDimensions(canvasRef.current, displaySize);
             const detections = await faceapi
                 .detectAllFaces(videoRef.current)
                 .withFaceLandmarks()
@@ -89,40 +89,43 @@ const VideoCapture = () => {
                 detections,
                 displaySize
             );
-
-            canvasRef.current
-                .getContext("2d")
-                .clearRect(
-                    0,
-                    0,
-                    canvasRef.current.twidth,
-                    canvasRef.current.height
-                );
+            console.log("canvasRef.current.width: ", canvasRef.current.width || canvasRef.current );
+            console.log("canvasRef.current.height: ", canvasRef.current.height || canvasRef.current );
+            canvasRef.current &&
+                canvasRef.current
+                    .getContext("2d")
+                    .clearRect(
+                        0,
+                        0,
+                        canvasRef.current.width,
+                        canvasRef.current.height
+                    );
 
             const results = resizedDetections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor);
             });
             console.log("RESULTS", results);
-            results.forEach((result, i) => {
-                // dots
-                faceapi.draw.drawFaceLandmarks(
-                    canvasRef.current,
-                    resizedDetections
-                );
-                // box
-                const box = resizedDetections[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box, {
-                    label: result,
+            canvasRef.current &&
+                results.forEach((result, i) => {
+                    // dots
+                    faceapi.draw.drawFaceLandmarks(
+                        canvasRef.current,
+                        resizedDetections
+                    );
+                    // box
+                    const box = resizedDetections[i].detection.box;
+                    const drawBox = new faceapi.draw.DrawBox(box, {
+                        label: result,
+                    });
+                    drawBox.draw(canvasRef.current);
                 });
-                drawBox.draw(canvasRef.current);
-            });
         }, 1000);
     };
 
     return (
         <div className="myapp">
             <h1>Face Detection</h1>
-            <div className="appvide">
+            <div className="appvideo">
                 <video crossOrigin="anonymous" ref={videoRef} autoPlay></video>
             </div>
             <canvas
