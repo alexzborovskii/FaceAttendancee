@@ -22,7 +22,7 @@ const AddUser = () => {
 
     return (
         <div id="add-user-root">
-            <Stack
+            {/* <Stack
                 component="form"
                 sx={{
                     width: "25ch",
@@ -31,7 +31,7 @@ const AddUser = () => {
                 spacing={2}
                 noValidate
                 autoComplete="off"
-            ></Stack>
+            ></Stack> */}
 
             <ThemeProvider theme={defaultTheme}>
                 <Container component="main" maxWidth="xs">

@@ -4,7 +4,7 @@ import {Routes, Route} from 'react-router-dom'
 import VideoCapture from './components/VideoCapture';
 import Nav from './components/Nav';
 import LoginRegister from '../src/components/LoginRegister.js'
-import HomeScreen from './components/HomeScreen';
+import AccountScreen from './components/AccountScreen';
 import AddUser from './components/AddUser';
 
 export const AppContext = createContext(null);
@@ -18,7 +18,7 @@ function App() {
       <Nav />
     <div className="App">
       <Routes>
-        <Route path='/' element={<Auth><HomeScreen /></Auth>} />
+        <Route path='/' element={<Auth><AccountScreen /></Auth>} />
         <Route path='/videocapture' element={<Auth><VideoCapture /></Auth>} />
         <Route path='/adduser' element={<Auth><AddUser /> </Auth>} />
         <Route path='/login' element={<LoginRegister title="Login" />}/>
