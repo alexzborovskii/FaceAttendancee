@@ -134,7 +134,6 @@ const uploadImage = async (req, res) => {
         });
         // get all publicIDs of the user
         const samples = await _getUserSamples({ user_id: userId });
-        console.log("SAMPLES: ", samples);
 
         res.json({ msg: samples });
     } catch (err) {

@@ -10,9 +10,10 @@ const {
     putUserInfo,
 } = require("../controllers/users.controllers.js");
 const express = require("express");
-const { verifyToken } = require("../middlewares/verify.token.js");
-const { _getUserSamples } = require("../models/users.model.js");
 const u_router = express.Router();
+const {verifyToken} = require('../middlewares/verify.token.js');
+
+
 
 u_router.post("/register", register);
 u_router.post("/login", login);
@@ -24,13 +25,12 @@ u_router.get("/logout", (res, req) => {
     req.user = null;
     res.sendStatus(200);
 });
-u_router.get("/userinfo/:id", getUserInfo);
-u_router.post("/upload", uploadImage);
-u_router.get("/userSamples/:id", getUserSamples);
-u_router.delete("/deleteSample/:publicID", delSample);
-u_router.put("/updateUserInfo/:id", putUserInfo);
-
-u_router.put("/putdescripters/:id", putDescriptors);
+u_router.get("/userinfo/:id", verifyToken, getUserInfo);
+u_router.post("/upload", verifyToken, uploadImage);
+u_router.get("/userSamples/:id", verifyToken, getUserSamples);
+u_router.delete("/deleteSample/:publicID", verifyToken, delSample);
+u_router.put("/updateUserInfo/:id", verifyToken, putUserInfo);
+u_router.put("/putdescripters/:id", verifyToken, putDescriptors);
 
 module.exports = {
     u_router,
