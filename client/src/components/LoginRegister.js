@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios";
+import axios from "axios";
 import { Box, TextField, Button } from "@mui/material";
 
 import { AppContext } from "../App";
@@ -9,38 +9,35 @@ const LoginRegister = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
-    const { setToken } = useContext(AppContext);
-
+    const { setToken, setUserId } = useContext(AppContext);
     const navigate = useNavigate();
 
     const handleAction = async () => {
         if (props.title === "Register") {
             try {
-                console.log("registered")
-                // const res = await axios.post("/api/users/register", {
-                //     email,
-                //     password,
-                // });
-                // if (res.status === 200) {
-                //     setMessage('');
+                const res = await axios.post("/api/users/register", {
+                    email,
+                    password,
+                });
+                if (res.status === 200) {
+                    setMessage('');
                     navigate('/login')
-                // }
+                }
             } catch (err) {
                 setMessage(err.response.data.msg)
             }
         } else {
             try {
-                console.log("logged in");
-                // const res = await axios.post("/api/users/login", {
-                //     email,
-                //     password,
-                // });
-                // if (res.status === 200) {
-                //     setMessage('');
-                //     console.log("res.data: ", res.data)
-                //     setToken(res.data)
+                const res = await axios.post("/api/users/login", {
+                    email,
+                    password,
+                });
+                if (res.status === 200) {
+                    setMessage('');
+                    setToken({token: res.data.token});
+                    setUserId(res.data.userId)
                     navigate('/')
-                // }
+                }
             } catch (err) {
                 setMessage(err.response.data.msg)
             }

@@ -11,6 +11,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.5.0",
+    "cloudinary-react": "^1.5.0",
+    "dotenv": "^16.3.1",
     "face-api.js": "^0.22.0",
     "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
@@ -19,6 +21,7 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
+  "proxy": "http://127.0.0.1:3005",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

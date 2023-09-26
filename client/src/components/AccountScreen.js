@@ -1,24 +1,64 @@
-import React, { useState } from "react";
-import { TextField, Button,  Stack, Box } from "@mui/material";
+import React, { useState, useEffect, useContext } from "react";
+import { TextField, Button, Stack, Box } from "@mui/material";
+// import Upload from "./Upload";
+import { useParams } from "react-router-dom";
+import { AppContext } from "../App.js";
+import Alert from "./Alert";
 
 const AccountScreen = () => {
-    const [firstName, setFirstName] = useState("your first name");
-    const [lastName, setLastName] = useState("your last name");
-    const [email, setEmail] = useState("email@example.com");
-    const [password, setPassword] = useState("****");
+    // account info
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [infoSuccessMsg, setIfoSuccessMsg] = useState("");
+    const [infoErrMsg, setInfoErrMsg] = useState("");
+    const param = useParams();
+    const { token, userId, setUserId } = useContext(AppContext);
 
-    function handleSubmit(event) {
-        event.preventDefault();
-        console.log("FORM SUBMITED");
-        console.log(firstName, lastName, email, password);
-    }
+    useEffect(() => {
+        getUserInfo();
+    }, []);
+
+    const getUserInfo = async () => {
+        try {
+            const res = await fetch(`/api/users/userinfo/${userId}`);
+            const data = await res.json();
+            const userInfo = data[0];
+            setFirstName(userInfo.fname);
+            setLastName(userInfo.lname);
+            setEmail(userInfo.email);
+            setUserId(userInfo.user_id);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const updateInfo = async (userId) => {
+        try {
+            const res = await fetch(`/api/users/updateUserInfo/${userId}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    fname: firstName,
+                    lname: lastName,
+                    email,
+                }),
+                headers: { "Content-Type": "application/json" },
+            });
+            const userData = await res.json();
+            setIfoSuccessMsg("Your info updated successfully");
+        } catch (err) {
+            console.error(err);
+            setInfoErrMsg("Something went wrong!");
+        }
+    };
 
     return (
         <>
             <h2>Edit profile</h2>
             <Box
                 component="form"
-                onSubmit={handleSubmit}
+                onSubmit={() => updateInfo(userId)} 
                 noValidate
                 sx={{ mt: 1, width: "50%" }}>
                 <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
@@ -65,9 +105,15 @@ const AccountScreen = () => {
                     fullWidth
                     sx={{ mb: 4 }}
                 />
-                <Button variant="contained" component="label" type="submit">
+                <Button
+                    variant="contained"
+                    component="label"
+                    type="submit"
+                    onClick={() => updateInfo(userId)}>
                     Save Changes
                 </Button>
+                <Alert msg={infoErrMsg} type="danger" />
+                <Alert msg={infoSuccessMsg} type="success" />
             </Box>
         </>
     );

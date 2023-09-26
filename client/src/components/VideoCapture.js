@@ -57,6 +57,8 @@ const VideoCapture = () => {
                         .withFaceDescriptor();
                     descriptions.push(detections.descriptor);
                 }
+                console.log("descriptions: ", descriptions);
+                console.log("new faceapi.LabeledFaceDescriptors(label, descriptions): ", new faceapi.LabeledFaceDescriptors(label, descriptions));
                 return new faceapi.LabeledFaceDescriptors(label, descriptions);
             })
         );
@@ -66,6 +68,7 @@ const VideoCapture = () => {
     const faceMyDetect = async () => {
         //LOADING DATA
         const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+        console.log("labeledFaceDescriptors: ", labeledFaceDescriptors)
         const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
 
         const displaySize = {
