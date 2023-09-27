@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import * as faceapi from "face-api.js";
 import "./VideoCapture.css";
+import { unDoStringify } from "../utils/parseDescriptions";
 
 const VideoCapture = () => {
     const videoRef = useRef();
@@ -42,34 +43,65 @@ const VideoCapture = () => {
     };
 
     //GET DESCRIPTIONS FOR ALL USERS
-    function getLabeledFaceDescriptions() {
-        const labels = ["Alex", "Yulia"];
-        return Promise.all(
-            labels.map(async (label) => {
-                const descriptions = [];
-                for (let i = 1; i <= 2; i++) {
-                    const img = await faceapi.fetchImage(
-                        `./labels/${label}/${i}.jpg`
+    const getLabeledFaceDescriptions = async () => {
+        /* Descriptors from React */
+        // const labels = ["Alex", "Yulia"];
+        // return Promise.all(
+        //     labels.map(async (label) => {
+        //         const descriptions = [];
+        //         for (let i = 1; i <= 2; i++) {
+        //             const img = await faceapi.fetchImage(
+        //                 `./labels/${label}/${i}.jpg`
+        //             );
+        //             const detections = await faceapi
+        //                 .detectSingleFace(img)
+        //                 .withFaceLandmarks()
+        //                 .withFaceDescriptor();
+        //             descriptions.push(detections.descriptor);
+        //         }
+        //         // console.log("descriptions: ", descriptions);
+        //         console.log("new faceapi.LabeledFaceDescriptors(label, descriptions): ", new faceapi.LabeledFaceDescriptors(label, descriptions));
+        //         return new faceapi.LabeledFaceDescriptors(label, descriptions);
+        //     })
+        // );
+
+        /* Descriptors from DB */
+        try {
+            const res = await fetch(`/api/users/getAllDescriptors/`);
+            const data = await res.json();
+            const lDescriptors = data.msg;
+            let newLabeledFaceDescriptors = [];
+
+            for (let i = 0; i < lDescriptors.length; i++) {
+                for (let j = 0; j < lDescriptors[i]._descriptors.length; j++) {
+                    lDescriptors[i]._descriptors[j] = unDoStringify(
+                        lDescriptors[i]._descriptors[j]
                     );
-                    const detections = await faceapi
-                        .detectSingleFace(img)
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-                    descriptions.push(detections.descriptor);
                 }
-                console.log("descriptions: ", descriptions);
-                console.log("new faceapi.LabeledFaceDescriptors(label, descriptions): ", new faceapi.LabeledFaceDescriptors(label, descriptions));
-                return new faceapi.LabeledFaceDescriptors(label, descriptions);
-            })
-        );
-    }
+                const newLDescriptor = new faceapi.LabeledFaceDescriptors(
+                    lDescriptors[i]._label,
+                    lDescriptors[i]._descriptors
+                );
+                newLabeledFaceDescriptors.push(newLDescriptor);
+            }
+
+            return newLabeledFaceDescriptors;
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     // RECOGNITION
     const faceMyDetect = async () => {
         //LOADING DATA
+        // from db
         const labeledFaceDescriptors = await getLabeledFaceDescriptions();
-        console.log("labeledFaceDescriptors: ", labeledFaceDescriptors)
+
+        //from react
+        // const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+
         const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+
 
         const displaySize = {
             width: videoRef.current.offsetWidth,
@@ -77,10 +109,11 @@ const VideoCapture = () => {
         };
 
         const detInt = setInterval(async () => {
-            if (!canvasRef.current ) {
+            if (!canvasRef.current) {
                 clearInterval(detInt);
             }
-            canvasRef.current && faceapi.matchDimensions(canvasRef.current, displaySize);
+            canvasRef.current &&
+                faceapi.matchDimensions(canvasRef.current, displaySize);
             const detections = await faceapi
                 .detectAllFaces(videoRef.current)
                 .withFaceLandmarks()
@@ -92,8 +125,6 @@ const VideoCapture = () => {
                 detections,
                 displaySize
             );
-            console.log("canvasRef.current.width: ", canvasRef.current.width || canvasRef.current );
-            console.log("canvasRef.current.height: ", canvasRef.current.height || canvasRef.current );
             canvasRef.current &&
                 canvasRef.current
                     .getContext("2d")
@@ -129,7 +160,7 @@ const VideoCapture = () => {
         <div className="myapp">
             <h1>Face Detection</h1>
             <div className="appvideo">
-                <video crossOrigin="anonymous" ref={videoRef} autoPlay></video>
+                <video crossOrigin="anonymous" ref={videoRef} width="640px" height="480px" autoPlay></video>
             </div>
             <canvas
                 ref={canvasRef}

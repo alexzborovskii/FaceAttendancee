@@ -8,6 +8,7 @@ const {
     delSample,
     putDescriptors,
     putUserInfo,
+    getDescriptors,
 } = require("../controllers/users.controllers.js");
 const express = require("express");
 const u_router = express.Router();
@@ -30,8 +31,10 @@ u_router.post("/upload", verifyToken, uploadImage);
 u_router.get("/userSamples/:id", verifyToken, getUserSamples);
 u_router.delete("/deleteSample/:publicID", verifyToken, delSample);
 u_router.put("/updateUserInfo/:id", verifyToken, putUserInfo);
-u_router.put("/putdescripters/:id", verifyToken, putDescriptors);
+// u_router.put("/putdescripters/:id", verifyToken, putDescriptors);
+u_router.get("/putdescripters/:id", putDescriptors);
+u_router.get("/getAllDescriptors/", getDescriptors);
 
 module.exports = {
-    u_router,
-};
+    u_router, 
+}; 

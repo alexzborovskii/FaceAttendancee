@@ -47,6 +47,19 @@ const _delUserSample = ({ publicid }) => {
     return db("samples").where({ publicid }).del().returning();
 };
 
+
+const _putDescriptors = ({user_id, descriptors}) => {
+    return db("users")
+    .update({ descriptors })
+    .where({ user_id })
+    .returning(["fname", "lname", "email", "descriptors"]);
+}
+
+const _getAllDescriptors = () => {
+    return db("users").select("descriptors");
+};
+
+
 module.exports = {
     _register,
     _login,
@@ -56,4 +69,6 @@ module.exports = {
     _delUserSample,
     _getSamplesAndUser,
     _putUserInfo,
+    _putDescriptors,
+    _getAllDescriptors
 };

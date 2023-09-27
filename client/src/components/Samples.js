@@ -4,6 +4,8 @@ import { Button } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import SendIcon from "@mui/icons-material/Send";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AppContext } from "../App.js";
 import { Image } from "cloudinary-react";
 
@@ -32,8 +34,8 @@ const Samples = (props) => {
     };
 
     const handleFileInputChange = (e) => {
-        if (e.target.files) { 
-        const file = e.target.files[0];
+        if (e.target.files) {
+            const file = e.target.files[0];
             previewFile(file);
             setSelectedFile(file);
             setFileInputState(e.target.value);
@@ -104,6 +106,18 @@ const Samples = (props) => {
         }
     };
 
+    const generateDescriptors = async (userId) => {
+        try {
+            const res = await fetch(`/api/users/putdescripters/${userId}`);
+            const data = await res.json();
+            console.log("DATA: ", data)
+            setSuccessMsg("Generated successfully");
+        } catch (error) {
+            console.error(error);
+            setErrMsg("Something went wrong! Descriptors not generated!");
+        }
+    }
+
     return (
         <div>
             <h1 className="title">Upload an Image</h1>
@@ -136,6 +150,19 @@ const Samples = (props) => {
                     // onClick={() => console.log("create user")}
                 >
                     Send
+                </Button>
+                <Button
+                    className="btn"
+                    sx={{ mt: 3, mb: 2, ml: 2 }}
+                    variant="contained"
+                    endIcon={
+                        <>
+                            <AutoFixHighIcon />
+                            <AccountCircleIcon />
+                        </>
+                    }
+                    onClick={() => generateDescriptors(userId)}>
+                    Generate recognition
                 </Button>
             </form>
             {}

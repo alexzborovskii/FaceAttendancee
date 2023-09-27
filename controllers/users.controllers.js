@@ -7,28 +7,19 @@ const {
     _delUserSample,
     _getSamplesAndUser,
     _putUserInfo,
+    _putDescriptors,
+    _getAllDescriptors,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { cloudinary } = require("../utils/cloudinary.js");
-
-// face api node
-// face api node
-// face api node
-// require('@tensorflow/tfjs-node');
-
+const { stringifyForEveryThing } = require("../utils/stringifyDescription.js");
+//faceapi
 const faceapi = require("face-api.js");
 const canvas = require("canvas");
-// const { log } = require("@tensorflow/tfjs-node"); 
-
-// patch nodejs environment, we need to provide an implementation of
-// HTMLCanvasElement and HTMLImageElement
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
-// face api node
-// face api node
-// face api node
 
 require("dotenv").config();
 
@@ -97,15 +88,17 @@ const getUserInfo = async (req, res) => {
 };
 
 const putUserInfo = async (req, res) => {
-        try {
-            const user_id  = req.params.id; 
-            const data = await _putUserInfo({...req.body, user_id});
-            res.status(200).json(data);
-        } catch (error) {
-            console.error(error);
-            res.status(404).json({ msg: "Something went wrong. Your info is not updated" }); 
-        }
-}
+    try {
+        const user_id = req.params.id;
+        const data = await _putUserInfo({ ...req.body, user_id });
+        res.status(200).json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Your info is not updated",
+        });
+    }
+};
 
 const getUserSamples = async (req, res) => {
     try {
@@ -145,11 +138,6 @@ const uploadImage = async (req, res) => {
 const delSample = async (req, res) => {
     const { publicID } = req.params;
     try {
-        //delete from cloudinary
-        // const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-        //     upload_preset: "",
-        // });
-
         const delResponse = await cloudinary.uploader.destroy(
             publicID,
             function (error, result) {
@@ -157,12 +145,10 @@ const delSample = async (req, res) => {
             }
         );
 
-        console.log("delResponse: ", delResponse);
-
+        console.log("delete from cloudinary ", delResponse);
         //delete from DB
-        console.log("publicID: ", publicID);
         const data = await _delUserSample({ publicid: publicID });
-        console.log("data: ", data);
+        console.log("delete from DB: ", data);
         res.json(data);
     } catch (error) {
         console.log(error);
@@ -170,25 +156,20 @@ const delSample = async (req, res) => {
     }
 };
 
-/***************************
-CURRENT - CREATE DESCRIPTORS
-***************************/
+
 const putDescriptors = async (req, res) => {
     try {
         // get samples and user info
         const user_id = req.params.id;
         const samplesAndUser = await _getSamplesAndUser({ user_id });
-        console.log("samplesAndUser: ", samplesAndUser); // array of objects
 
-        // get labled descriptors
+        // GET LABELED DESCRIPTORS
 
         // label
         let label = "";
         if (samplesAndUser.length > 0) {
             const { fname, lname, email } = samplesAndUser[0];
-            console.log("EMAIL AFTER DESCTRUCTURING: ", email);
             fname && lname ? (label = `${fname} ${lname}`) : (label = email);
-            console.log("label", label);
         }
 
         // LOAD THE WEIGHTS
@@ -199,27 +180,52 @@ const putDescriptors = async (req, res) => {
         //descriptors
         const descriptions = [];
         for (let i = 0; i < samplesAndUser.length; i++) {
-            const url = cloudinary.url(samplesAndUser[i].publicid);
-            console.log("URL", url);
-            console.log("11111111");
-            const img = await canvas.loadImage(url);
-            console.log("222222222222");
-            const detections = await faceapi
-                .detectSingleFace(img)
-                .withFaceLandmarks()
-                .withFaceDescriptor();
-            console.log("333333");
-            descriptions.push(detections.descriptor);
+            try {
+                const url = cloudinary.url(samplesAndUser[i].publicid);
+                console.log(`image ${i}`);
+                const img = await canvas.loadImage(url);
+                const detections = await faceapi
+                    .detectSingleFace(img)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                descriptions.push(detections.descriptor);
+            } catch (error) {
+                console.error(error);
+            }
         }
-        console.log("descriptions: ", descriptions);
-        const labeledFaceDescriptors = new faceapi.LabeledFaceDescriptors(
-            label,
-            descriptions
-        );
-        console.log("labeledFaceDescriptors: ", labeledFaceDescriptors);
+
+        let typedDescriptionsJson = [];
+        for (let i = 0; i < descriptions.length; i++) {
+            typedDescriptionsJson.push(
+                stringifyForEveryThing(descriptions[i])
+            );
+        }
+
+        const labeledFaceDescriptors = {
+            _label: label,
+            _descriptors: typedDescriptionsJson
+        };
+
         // put
-        /* put descriptors into DB here*/
-        res.json({ msg: samplesAndUser });
+
+        const data = await _putDescriptors({
+            descriptors: labeledFaceDescriptors,
+            user_id,
+        });
+
+        res.json({ msg: samplesAndUser, data: data });
+    } catch (error) {
+        console.error(error);
+    }
+};
+const getDescriptors = async (req, res) => {
+    try {
+        const user_id = req.params.id;
+        const descriptorsObj = await _getAllDescriptors({ user_id });
+        const descriptors = descriptorsObj.map((obj) =>
+            JSON.parse(obj.descriptors)
+        );
+        res.json({ msg: descriptors });
     } catch (error) {
         console.error(error);
     }
@@ -235,4 +241,5 @@ module.exports = {
     delSample,
     putDescriptors,
     putUserInfo,
+    getDescriptors,
 };
