@@ -27,7 +27,6 @@ const Samples = (props) => {
         try {
             const res = await fetch(`/api/users/userSamples/`);
             const data = await res.json();
-            console.log("data: ", data)
             setPublicIDs(data.msg);
         } catch (error) {
             console.error(error);
