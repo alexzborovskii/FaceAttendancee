@@ -20,7 +20,6 @@ const canvas = require("canvas");
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
-
 require("dotenv").config();
 
 const login = async (req, res) => {
@@ -75,7 +74,7 @@ const register = async (req, res) => {
 };
 
 const getUserInfo = async (req, res) => {
-    const id = req.params.id;
+    const id = req.user.userId;
     const user = await _getUserInfo(id);
     if (!user) return res.sendStatus(404); //.json({ msg: "Product not found" });
     const userArr = Object.keys(user[0]);
@@ -89,7 +88,7 @@ const getUserInfo = async (req, res) => {
 
 const putUserInfo = async (req, res) => {
     try {
-        const user_id = req.params.id;
+        const user_id = req.user.userId;
         const data = await _putUserInfo({ ...req.body, user_id });
         res.status(200).json(data);
     } catch (error) {
@@ -102,7 +101,7 @@ const putUserInfo = async (req, res) => {
 
 const getUserSamples = async (req, res) => {
     try {
-        const user_id = req.params.id;
+        const user_id = req.user.userId;
         const samples = await _getUserSamples({ user_id });
         res.json({ msg: samples });
     } catch (error) {
@@ -119,7 +118,7 @@ const uploadImage = async (req, res) => {
             upload_preset: "",
         });
         // post publickID to DB.samples
-        const userId = req.body.userId;
+        const userId = req.user.userId;
         const publicID = uploadResponse.public_id;
         const data = await _insertSample({
             user_id: userId,
@@ -156,11 +155,10 @@ const delSample = async (req, res) => {
     }
 };
 
-
 const putDescriptors = async (req, res) => {
     try {
         // get samples and user info
-        const user_id = req.params.id;
+        const user_id = req.user.userId;
         const samplesAndUser = await _getSamplesAndUser({ user_id });
 
         // GET LABELED DESCRIPTORS
@@ -196,14 +194,12 @@ const putDescriptors = async (req, res) => {
 
         let typedDescriptionsJson = [];
         for (let i = 0; i < descriptions.length; i++) {
-            typedDescriptionsJson.push(
-                stringifyForEveryThing(descriptions[i])
-            );
+            typedDescriptionsJson.push(stringifyForEveryThing(descriptions[i]));
         }
 
         const labeledFaceDescriptors = {
             _label: label,
-            _descriptors: typedDescriptionsJson
+            _descriptors: typedDescriptionsJson,
         };
 
         // put
@@ -220,7 +216,7 @@ const putDescriptors = async (req, res) => {
 };
 const getDescriptors = async (req, res) => {
     try {
-        const user_id = req.params.id;
+        const user_id = req.user.userId;
         const descriptorsObj = await _getAllDescriptors({ user_id });
         const descriptors = descriptorsObj.map((obj) =>
             JSON.parse(obj.descriptors)

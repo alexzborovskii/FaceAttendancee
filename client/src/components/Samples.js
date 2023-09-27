@@ -25,8 +25,9 @@ const Samples = (props) => {
 
     const getUserSamples = async () => {
         try {
-            const res = await fetch(`/api/users/userSamples/${userId}`);
+            const res = await fetch(`/api/users/userSamples/`);
             const data = await res.json();
+            console.log("data: ", data)
             setPublicIDs(data.msg);
         } catch (error) {
             console.error(error);
@@ -70,7 +71,7 @@ const Samples = (props) => {
 
             const res = await fetch("/api/users/upload", {
                 method: "POST",
-                body: JSON.stringify({ userId, data: base64EncodedImage }),
+                body: JSON.stringify({ data: base64EncodedImage }),
                 headers: { "Content-Type": "application/json" },
             });
             console.log("res: ", res);
@@ -108,7 +109,7 @@ const Samples = (props) => {
 
     const generateDescriptors = async (userId) => {
         try {
-            const res = await fetch(`/api/users/putdescripters/${userId}`);
+            const res = await fetch(`/api/users/putdescripters/`);
             const data = await res.json();
             console.log("DATA: ", data)
             setSuccessMsg("Generated successfully");

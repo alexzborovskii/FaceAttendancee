@@ -22,7 +22,7 @@ const AccountScreen = () => {
 
     const getUserInfo = async () => {
         try {
-            const res = await fetch(`/api/users/userinfo/${userId}`);
+            const res = await fetch(`/api/users/userinfo/`);
             const data = await res.json();
             const userInfo = data[0];
             setFirstName(userInfo.fname);
@@ -36,7 +36,7 @@ const AccountScreen = () => {
 
     const updateInfo = async (userId) => {
         try {
-            const res = await fetch(`/api/users/updateUserInfo/${userId}`, {
+            const res = await fetch(`/api/users/updateUserInfo/`, {
                 method: "PUT",
                 body: JSON.stringify({
                     fname: firstName,
