@@ -214,6 +214,7 @@ const putDescriptors = async (req, res) => {
         console.error(error);
     }
 };
+
 const getDescriptors = async (req, res) => {
     try {
         const user_id = req.user.userId;
@@ -224,6 +225,22 @@ const getDescriptors = async (req, res) => {
         res.json({ msg: descriptors });
     } catch (error) {
         console.error(error);
+    }
+};
+
+const postDetection = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        // const time 
+        const data = await _insertSample({
+            user_id: userId,
+            // time: time,
+        });
+
+        res.status(200).json({ msg: `Detection ${data} saved` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ err: "Something went wrong" });
     }
 };
 

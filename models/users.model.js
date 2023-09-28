@@ -59,6 +59,12 @@ const _getAllDescriptors = () => {
     return db("users").select("descriptors");
 };
 
+const _postDetection = ({user_id, time}) => {
+    return db("detections")
+        .insert({ user_id, time })
+        .returning(["user_id", "time"]);
+};
+
 
 module.exports = {
     _register,
@@ -70,5 +76,6 @@ module.exports = {
     _getSamplesAndUser,
     _putUserInfo,
     _putDescriptors,
-    _getAllDescriptors
+    _getAllDescriptors,
+    _postDetection,
 };

@@ -119,7 +119,12 @@ const VideoCapture = () => {
                 const results = resizedDetections.map((d) => {
                     return faceMatcher.findBestMatch(d.descriptor);
                 });
-                console.log("RESULTS", results);
+                results.forEach((result) => {
+                    if (result._label){
+                        console.log("result._label: ", result._label);
+                        console.log("date.now: ", Date.now()/1000)
+                    }
+                })
                 canvasRef.current &&
                     results.forEach((result, i) => {
                         // dots
@@ -134,7 +139,7 @@ const VideoCapture = () => {
                         });
                         drawBox.draw(canvasRef.current);
                     });
-            }, 1000);
+            }, 500);
         } catch (error) {
             console.error(error);
             intervalId.current && clearInterval(intervalId.current);
