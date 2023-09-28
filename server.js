@@ -1,6 +1,6 @@
 const express = require("express");
-const cors = require("cors");
 const path = require('path');
+const cors = require("cors");
 //
 const cookieParser = require("cookie-parser")
 require("dotenv").config();
@@ -22,3 +22,12 @@ app.listen(process.env.PORT || 3005, () => {
 //3005
 
 app.use("/api/users", u_router);
+
+
+// Have Node serve the files for built React app
+app.use(express.static(path.join(__dirname, "/client/build")));
+
+// all other get requests go to React
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+});
