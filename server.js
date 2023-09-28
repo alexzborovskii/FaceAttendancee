@@ -24,7 +24,7 @@ app.listen(process.env.PORT || 3005, () => {
 app.use("/api/users", u_router);
 
 
-// Have Node serve the files for built React app
+// make Node serve the files for built React app
 app.use(express.static(path.join(__dirname, "/client/build")));
 
 // all other get requests go to React
