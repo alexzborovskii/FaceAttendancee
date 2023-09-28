@@ -48,7 +48,7 @@ const _delUserSample = ({ publicid }) => {
 };
 
 
-const _putDescriptors = ({user_id, descriptors}) => {
+const _putDescriptors = (data) => {
     return db("users")
     .update({ descriptors })
     .where({ user_id })
@@ -59,9 +59,9 @@ const _getAllDescriptors = () => {
     return db("users").select("descriptors");
 };
 
-const _postDetection = ({user_id, time}) => {
+const _postDetection = (fieldsToInsert) => {
     return db("detections")
-        .insert({ user_id, time })
+        .insert(fieldsToInsert)
         .returning(["user_id", "time"]);
 };
 

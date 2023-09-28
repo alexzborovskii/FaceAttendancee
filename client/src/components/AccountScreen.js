@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import { TextField, Button, Stack, Box } from "@mui/material";
-// import Upload from "./Upload";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../App.js";
 import Alert from "./Alert";
@@ -13,8 +12,7 @@ const AccountScreen = () => {
     const [password, setPassword] = useState("");
     const [infoSuccessMsg, setIfoSuccessMsg] = useState("");
     const [infoErrMsg, setInfoErrMsg] = useState("");
-    const param = useParams();
-    const { token, userId, setUserId } = useContext(AppContext);
+    const { userId, setUserId } = useContext(AppContext);
 
     useEffect(() => {
         getUserInfo();

@@ -2,9 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import * as faceapi from "face-api.js";
 import "./VideoCapture.css";
 import { unDoStringify } from "../utils/parseDescriptions";
+import axios from "axios";
 
 const VideoCapture = () => {
     const intervalId = useRef();
+    const sendIntervalId = useRef();
     const videoRef = useRef();
     const canvasRef = useRef();
     let streamVideo = "";
@@ -16,6 +18,7 @@ const VideoCapture = () => {
         videoRef && loadModels();
         return () => {
             clearInterval(intervalId.current);
+            clearInterval(sendIntervalId.current);
             tracks && stopVideo();
         };
     }, []);
@@ -92,7 +95,13 @@ const VideoCapture = () => {
                 height: videoRef.current.offsetHeight,
             };
 
+            let buffer = [];
+            let dataToSend = [];
+            let recentlyRecognized = [];
+
+            // RECOGNITION LOOP
             const detInt = setInterval(async () => {
+                // RECOGNIZE
                 intervalId.current = detInt;
                 canvasRef.current &&
                     faceapi.matchDimensions(canvasRef.current, displaySize);
@@ -101,7 +110,7 @@ const VideoCapture = () => {
                     .withFaceLandmarks()
                     .withFaceDescriptors();
 
-                // DRAW FACE IN WEBCAM
+                // CLEAR RECOGNITION BOX
                 const resizedDetections = faceapi.resizeResults(
                     detections,
                     displaySize
@@ -119,14 +128,11 @@ const VideoCapture = () => {
                 const results = resizedDetections.map((d) => {
                     return faceMatcher.findBestMatch(d.descriptor);
                 });
-                results.forEach((result) => {
-                    if (result._label){
-                        console.log("result._label: ", result._label);
-                        console.log("date.now: ", Date.now()/1000)
-                    }
-                })
+
+                // MANAGE RESULTS
                 canvasRef.current &&
                     results.forEach((result, i) => {
+                        // DRAW FACE IN WEBCAM
                         // dots
                         faceapi.draw.drawFaceLandmarks(
                             canvasRef.current,
@@ -138,8 +144,97 @@ const VideoCapture = () => {
                             label: result,
                         });
                         drawBox.draw(canvasRef.current);
+
+                        //SAVE RECOGNITIONS
+                        if (result._label !== "unknown") {
+
+                            //get index or -1
+                            const buffInd = buffer.findIndex(
+                                (item) => item.label === result._label
+                            );
+                            //create if there isn`t
+                            if (buffInd === -1) {
+                                const newObj = {
+                                    label: result._label,
+                                    time: new Date().toISOString(),
+                                    recInRow: 1,
+                                    notRecInRow: 0,
+                                };
+                                buffer.push(newObj);
+                            } else {
+                                //update if there is
+                                buffer[buffInd].recInRow++;
+
+                                if (buffer[buffInd].recInRow === 2) {
+                                    if (
+                                        !recentlyRecognized.find(
+                                            (item) =>
+                                                item.user_id ==
+                                                buffer[buffInd].label
+                                        )
+                                    ) {
+                                        // add to data to be sent
+                                        dataToSend.push({
+                                            user_id: Number(
+                                                buffer[buffInd].label
+                                            ),
+                                            time: buffer[buffInd].time,
+                                        });
+                                        // add to recently recognized
+                                        recentlyRecognized.push({
+                                            user_id: buffer[buffInd].label,
+                                            ttl: 2 * 5 * 60,
+                                        }); // ttl in recognition interval
+
+                                    }
+                                }
+                            }
+                        }
                     });
+
+                /* check buffer here */
+                buffer.forEach((item, index) => {
+                    const resInd = results.findIndex(
+                        (result) => result._label === item.label
+                    );
+                    if (resInd === -1) {
+                        item.notRecInRow++;
+                        if (item.notRecInRow === 5) {
+                            buffer.splice(index, 1);
+                        }
+                    }
+                    // console.log("item", item);
+                });
+
+                /* update recently recognized here */
+                recentlyRecognized.forEach((item, index) => {
+                    item.ttl--;
+                    if (item.ttl === 0) {
+                        recentlyRecognized.splice(index, 1);
+                    }
+                });
             }, 500);
+
+            /* SEND DATA TO DB LOOP */
+            const sendDataTime = 30 * 1000;
+            const sendInt = setInterval(async () => {
+                sendIntervalId.current = sendInt;
+                if (dataToSend.length > 0) {
+                    try {
+                        const res = await axios.post(
+                            "/api/users/postdetection",
+                            {
+                                data: dataToSend,
+                            }
+                        );
+                        if (res.status === 200) {
+                            dataToSend = [];
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }, sendDataTime);
         } catch (error) {
             console.error(error);
             intervalId.current && clearInterval(intervalId.current);

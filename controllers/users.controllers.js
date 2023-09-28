@@ -9,6 +9,7 @@ const {
     _putUserInfo,
     _putDescriptors,
     _getAllDescriptors,
+    _postDetection,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -164,11 +165,12 @@ const putDescriptors = async (req, res) => {
         // GET LABELED DESCRIPTORS
 
         // label
-        let label = "";
-        if (samplesAndUser.length > 0) {
-            const { fname, lname, email } = samplesAndUser[0];
-            fname && lname ? (label = `${fname} ${lname}`) : (label = email);
-        }
+        let label = user_id+"";
+        console.log("label: ", label);
+        // if (samplesAndUser.length > 0) {
+        //     const { fname, lname, email } = samplesAndUser[0];
+        //     fname && lname ? (label = `${fname} ${lname}`) : (label = email);
+        // }
 
         // LOAD THE WEIGHTS
         await faceapi.nets.ssdMobilenetv1.loadFromDisk("./weights");
@@ -230,14 +232,13 @@ const getDescriptors = async (req, res) => {
 
 const postDetection = async (req, res) => {
     try {
-        const userId = req.user.userId;
-        // const time 
-        const data = await _insertSample({
-            user_id: userId,
-            // time: time,
-        });
+        const data = req.body.data;
+        const fieldsToInsert = data.map(field => 
+            ({ user_id: field.user_id, time: field.time })); 
+        const DBres = await _postDetection(fieldsToInsert);
+        console.log("Data saved to DB: ", DBres);
 
-        res.status(200).json({ msg: `Detection ${data} saved` });
+        res.status(200).json({ msg: `Detection ${req.body} saved` }); 
     } catch (err) {
         console.error(err);
         res.status(500).json({ err: "Something went wrong" });
@@ -248,11 +249,11 @@ module.exports = {
     register,
     login,
     getUserInfo,
-    // postSample,
     uploadImage,
     getUserSamples,
     delSample,
     putDescriptors,
     putUserInfo,
     getDescriptors,
+    postDetection
 };

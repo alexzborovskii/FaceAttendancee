@@ -9,6 +9,7 @@ const {
     putDescriptors,
     putUserInfo,
     getDescriptors,
+    postDetection,
 } = require("../controllers/users.controllers.js");
 const express = require("express");
 const u_router = express.Router();
@@ -31,9 +32,10 @@ u_router.put("/updateUserInfo/", verifyToken, putUserInfo);
 u_router.post("/upload", verifyToken, uploadImage);
 u_router.get("/userSamples/", verifyToken, getUserSamples);
 u_router.delete("/deleteSample/:publicID", verifyToken, delSample);
-// u_router.put("/putdescripters/:id", verifyToken, putDescriptors);
 u_router.get("/putdescripters/",verifyToken, putDescriptors);
 u_router.get("/getAllDescriptors/", verifyToken, getDescriptors);
+u_router.post("/postdetection/", postDetection);
+
 
 module.exports = {
     u_router, 
