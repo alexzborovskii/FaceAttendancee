@@ -226,6 +226,14 @@ const VideoCapture = () => {
                             }
                         );
                         if (res.status === 200) {
+                            dataToSend.forEach((recognition) => {
+                                const buffCleanIndex = buffer.findIndex(
+                                    (item) => item.label == recognition.user_id
+                                );
+                                if (buffCleanIndex != -1) {
+                                    buffer.splice(buffCleanIndex, 1);
+                                }
+                            });
                             dataToSend = [];
                         }
                     } catch (error) {
