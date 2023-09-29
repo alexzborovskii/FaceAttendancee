@@ -47,8 +47,7 @@ const _delUserSample = ({ publicid }) => {
     return db("samples").where({ publicid }).del().returning();
 };
 
-
-const _putDescriptors = (data) => {
+const _putDescriptors = ({descriptors, user_id}) => {
     return db("users")
     .update({ descriptors })
     .where({ user_id })

@@ -221,9 +221,12 @@ const getDescriptors = async (req, res) => {
     try {
         const user_id = req.user.userId;
         const descriptorsObj = await _getAllDescriptors({ user_id });
-        const descriptors = descriptorsObj.map((obj) =>
+
+        console.log("descriptorsObj: ", descriptorsObj);
+        const descriptors = descriptorsObj.filter(obj => obj.descriptors != null ).map((obj) =>
             JSON.parse(obj.descriptors)
         );
+
         res.json({ msg: descriptors });
     } catch (error) {
         console.error(error);

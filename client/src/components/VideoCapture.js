@@ -147,7 +147,6 @@ const VideoCapture = () => {
 
                         //SAVE RECOGNITIONS
                         if (result._label !== "unknown") {
-
                             //get index or -1
                             const buffInd = buffer.findIndex(
                                 (item) => item.label === result._label
@@ -185,7 +184,6 @@ const VideoCapture = () => {
                                             user_id: buffer[buffInd].label,
                                             ttl: 2 * 5 * 60,
                                         }); // ttl in recognition interval
-
                                     }
                                 }
                             }
