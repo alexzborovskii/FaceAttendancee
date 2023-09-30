@@ -59,14 +59,14 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-    const { email, password } = req.body;
+    const { lname, fname, email, password } = req.body;
     const lower_email = email.toLowerCase();
 
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password + "", salt);
-
     try {
-        const row = await _register(lower_email, hash);
+        if (!lname || !fname || !email || !password) return res.status(404).json("Some fields are empty");
+        const row = await _register(lname, fname, lower_email, hash);
         res.json(row);
     } catch (error) {
         console.log(error);
@@ -82,8 +82,8 @@ const logout = async (req, res) => {
 const getUserInfo = async (req, res) => {
     const id = req.user.userId;
     const user = await _getUserInfo(id);
-    if (!user) return res.sendStatus(404); //.json({ msg: "Product not found" });
-    const userArr = Object.keys(user[0]);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    const userArr = Object.keys(user[0]); 
     userArr.forEach((key) => {
         if (user[0][key] === null) {
             user[0][key] = "";

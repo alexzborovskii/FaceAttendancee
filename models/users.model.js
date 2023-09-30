@@ -1,9 +1,9 @@
 const { db } = require("../config/db.js");
 
-const _register = (email, password) => {
+const _register = (lname, fname, email, password) => {
     return db("users")
-        .insert({ email, password })
-        .returning(["user_id", "email"]);
+        .insert({ lname, fname, email, password })
+        .returning(["fname", "lname", "user_id", "email"]);
 };
 
 const _login = (email) => {

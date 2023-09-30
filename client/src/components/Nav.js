@@ -32,7 +32,6 @@ const Nav = (props) => {
 
     return (
         <Stack spacing={2} direction={"row"}>
-            {console.log("token: ", token)}
             <Button component={Link} to="/">
                 My Account
             </Button>
@@ -45,14 +44,8 @@ const Nav = (props) => {
             <Button component={Link} to="/login">
                 Login
             </Button>
-            <Button component={Link} to="/loginR">
-                LoginR
-            </Button>
             <Button component={Link} to="/register">
                 Register
-            </Button>
-            <Button component={Link} to="/registerL">
-                RegisterL
             </Button>
             <Button onClick={logout}>Logout</Button>
         </Stack>
