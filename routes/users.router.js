@@ -1,8 +1,8 @@
 const {
     register,
     login,
+    logout,
     getUserInfo,
-    // postSample,
     uploadImage,
     getUserSamples,
     delSample,
@@ -16,17 +16,13 @@ const u_router = express.Router();
 const {verifyToken} = require('../middlewares/verify.token.js');
 
 
-
-u_router.post("/register", register);
-u_router.post("/login", login);
 u_router.get("/verify", verifyToken, (req, res) => {
     res.sendStatus(200); 
 });
-u_router.get("/logout", (res, req) => {
-    res.clearCookie("token");
-    req.user = null;
-    res.sendStatus(200);
-}); 
+
+u_router.post("/register", register);
+u_router.post("/login", login);
+u_router.get("/logout", logout); 
 u_router.get("/userinfo/", verifyToken, getUserInfo);
 u_router.put("/updateUserInfo/", verifyToken, putUserInfo);
 u_router.post("/upload", verifyToken, uploadImage);

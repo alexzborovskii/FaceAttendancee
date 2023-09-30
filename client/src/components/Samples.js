@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import Alert from "./Alert";
+import AlertMsg from "./Alert";
 import { Button } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteForever from "@mui/icons-material/DeleteForever";
@@ -121,8 +121,8 @@ const Samples = (props) => {
     return (
         <div>
             <h1 className="title">Upload an Image</h1>
-            <Alert msg={errMsg} type="danger" />
-            <Alert msg={successMsg} type="success" />
+            <AlertMsg msg={errMsg} type="danger" />
+            <AlertMsg msg={successMsg} type="success" />
             <form onSubmit={handleSubmitFile} className="form">
                 <Button
                     sx={{ mt: 3, mb: 2 }}

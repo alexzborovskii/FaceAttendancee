@@ -26,16 +26,17 @@ require("dotenv").config();
 const login = async (req, res) => {
     try {
         const row = await _login(req.body.email.toLowerCase());
+        console.log("row: ", row)
         //email
         if (row.length === 0) {
-            return res.status(404).json({ msg: "email not found" });
+            return res.status(404).json({ msg: "Email not found" });
         }
         //password
         const match = await bcrypt.compare(
             req.body.password + "",
             row[0].password
         );
-        if (!match) return res.status(404).json({ msg: "wrong password" });
+        if (!match) return res.status(404).json({ msg: "Wrong password!" });
         //successful login
         const userId = row[0].user_id;
         const email = row[0].email;
@@ -51,7 +52,7 @@ const login = async (req, res) => {
             maxAge: 60 * 60 * 1000,
         });
         //resp with token and uesrId
-        res.json({ token: accessToken, userId });
+        res.json({ token: accessToken});
     } catch (err) {
         console.log(err);
         res.status(404).json({ msg: "something went wrong" });
@@ -74,6 +75,11 @@ const register = async (req, res) => {
     }
 };
 
+const logout = async (req, res) => {
+    res.clearCookie("token");
+    req.user = null;
+    res.sendStatus(200);
+}
 const getUserInfo = async (req, res) => {
     const id = req.user.userId;
     const user = await _getUserInfo(id);
@@ -249,6 +255,7 @@ const postDetection = async (req, res) => {
 module.exports = {
     register,
     login,
+    logout,
     getUserInfo,
     uploadImage,
     getUserSamples,

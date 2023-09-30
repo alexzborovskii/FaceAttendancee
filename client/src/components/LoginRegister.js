@@ -11,6 +11,7 @@ const LoginRegister = (props) => {
     const [message, setMessage] = useState("");
     const { setToken, setUserId } = useContext(AppContext);
     const navigate = useNavigate();
+    
 
     const handleAction = async () => {
         if (props.title === "Register") {

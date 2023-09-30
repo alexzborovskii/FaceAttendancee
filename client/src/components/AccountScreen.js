@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { TextField, Button, Stack, Box } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../App.js";
-import Alert from "./Alert";
+import AlertMsg from "./Alert";
 
 const AccountScreen = () => {
     // account info
@@ -26,7 +26,6 @@ const AccountScreen = () => {
             setFirstName(userInfo.fname);
             setLastName(userInfo.lname);
             setEmail(userInfo.email);
-            setUserId(userInfo.user_id);
         } catch (e) {
             console.log(e);
         }
@@ -110,8 +109,8 @@ const AccountScreen = () => {
                     onClick={() => updateInfo(userId)}>
                     Save Changes
                 </Button>
-                <Alert msg={infoErrMsg} type="danger" />
-                <Alert msg={infoSuccessMsg} type="success" />
+                <AlertMsg msg={infoErrMsg} type="error" />
+                <AlertMsg msg={infoSuccessMsg} type="success" />
             </Box>
         </>
     );

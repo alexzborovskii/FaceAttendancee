@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import Alert from '@mui/material/Alert';
 
-const  Alert = ({ msg, type }) => {
+const AlertMsg = ({ msg, type, setMessage }) => {
     const [show, setShow] = useState(false);
     useEffect(() => {
         if (msg) {
             setShow(true);
-            setInterval(() => {
-                setShow(false);
-            }, 3000);
         }
     }, [msg]);
-    return <>{show && <div className={`alert alert-${type}`}>{msg}</div>}</>;
-}
 
-export default Alert;
+    return <>{show && <Alert severity={type}>{msg}</Alert>}</>;
+};
+
+export default AlertMsg;
