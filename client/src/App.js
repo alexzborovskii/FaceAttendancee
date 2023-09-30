@@ -8,7 +8,6 @@ import AccountScreen from './components/AccountScreen';
 import AddUser from './components/AddUser';
 import Samples from './components/Samples';
 import LogIn from './components/Login';
-import Logout from './components/Logout';
 
 export const AppContext = createContext(null);
 
@@ -24,8 +23,9 @@ function App() {
         <Route path='/' element={<Auth><AccountScreen /><Samples /></Auth>} />
         <Route path='/videocapture' element={<Auth><VideoCapture /></Auth>} />
         <Route path='/adduser' element={<Auth><AddUser /> </Auth>} />
-        <Route path='/loginR' element={<LoginRegister title="LoginR" />}/>
         <Route path='/login' element={<LogIn />}/>
+        {/* <Route path='/re  gister' element={<Register />}/> */}
+        <Route path='/loginR' element={<LoginRegister title="LoginR" />}/>
         <Route path='/registerL' element={<LoginRegister title="RegisterL" />}/>
         {/* <Route path='/logout' element={<Logout />}/> */}
       </Routes>

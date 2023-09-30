@@ -26,7 +26,6 @@ require("dotenv").config();
 const login = async (req, res) => {
     try {
         const row = await _login(req.body.email.toLowerCase());
-        console.log("row: ", row)
         //email
         if (row.length === 0) {
             return res.status(404).json({ msg: "Email not found" });
@@ -171,6 +170,7 @@ const putDescriptors = async (req, res) => {
         // GET LABELED DESCRIPTORS
 
         // label
+        // label = user_id
         let label = user_id+"";
         console.log("label: ", label);
         // if (samplesAndUser.length > 0) {
