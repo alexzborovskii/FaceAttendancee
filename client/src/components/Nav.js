@@ -35,8 +35,8 @@ const Nav = (props) => {
             <Button component={Link} to="/">
                 My Account
             </Button>
-            <Button component={Link} to="/adduser">
-                Add User
+            <Button component={Link} to="/adminStatistics">
+                Admin Statistics
             </Button>
             <Button component={Link} to="/statistics">
                 Statistics

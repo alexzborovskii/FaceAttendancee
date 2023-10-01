@@ -12,6 +12,9 @@ const {
     _postDetection,
     _getUserStatistics,
     _getUserStatisticsTotal,
+    _getAdminStatistics,
+    _getAdminStatisticsTotal,
+    
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -283,6 +286,35 @@ const getUserStatistics = async (req, res) => {
         });
     }
 }
+const getAdminStatistics = async (req, res) => {
+    try {
+        //for pagination
+        let { page, limit } = req.query
+        if (!page) page = 0
+        if (!limit) limit = 10
+        page = parseInt(page)
+        limit = parseInt(limit)
+        //function
+        // const user_id = req.user.userId;
+        const data = await _getAdminStatistics({ perPage: limit, currentPage: page+1 });
+        const totalObj = await _getAdminStatisticsTotal();
+        const cleanedData = data.data.map((row) => {
+            const detection_id = row.detection_id;
+            const user_id = row.user_id;
+            const name = `${row.fname} ${row.lname}`
+            const time = row.time.toLocaleTimeString("en-US", { hour12: false });
+            const date =  `${row.time.getFullYear()}-${row.time.getMonth()+1}-${row.time.getDate()}`;
+            
+            return {detection_id, user_id, name, date, time,  }
+        })
+        res.status(200).json({data: cleanedData, total: Number(totalObj[0].count)});
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get your statistcs",
+        });
+    }
+}
 
 
 
@@ -298,5 +330,6 @@ module.exports = {
     putUserInfo,
     getDescriptors,
     postDetection,
-    getUserStatistics
+    getUserStatistics,
+    getAdminStatistics
 };

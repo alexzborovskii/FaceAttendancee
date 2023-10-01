@@ -77,25 +77,44 @@ const _getUserStatistics = ({ user_id, perPage, currentPage }) => {
         });
 
     };
-
+    
     const _getUserStatisticsTotal = ({user_id}) => {
         return db("detections as d")
         .count("detection_id")
         .where({ user_id })
     }
 
-module.exports = {
-    _register,
-    _login,
-    _getUserInfo,
-    _insertSample,
-    _getUserSamples,
-    _delUserSample,
+    const _getAdminStatistics = ({  perPage, currentPage }) => {
+        return db("detections as d")
+            .join("users as u", "u.user_id", "d.user_id")
+            .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
+            .orderBy("d.detection_id", "desc")
+            .paginate({
+                perPage,
+                currentPage,
+            });
+    
+        };
+
+    const _getAdminStatisticsTotal = () => {
+        return db("detections as d")
+        .count("detection_id")
+    }
+    
+    module.exports = {
+        _register,
+        _login,
+        _getUserInfo,
+        _insertSample,
+        _getUserSamples,
+        _delUserSample,
     _getSamplesAndUser,
     _putUserInfo,
     _putDescriptors,
     _getAllDescriptors,
     _postDetection,
     _getUserStatistics,
-    _getUserStatisticsTotal
+    _getUserStatisticsTotal,
+    _getAdminStatistics,
+    _getAdminStatisticsTotal
 };

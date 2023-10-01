@@ -10,7 +10,8 @@ const {
     putUserInfo,
     getDescriptors,
     postDetection,
-    getUserStatistics
+    getUserStatistics,
+    getAdminStatistics
 } = require("../controllers/users.controllers.js");
 const express = require("express");
 const u_router = express.Router();
@@ -33,6 +34,7 @@ u_router.get("/putdescripters/",verifyToken, putDescriptors);
 u_router.get("/getAllDescriptors/", verifyToken, getDescriptors);
 u_router.post("/postdetection/", postDetection);
 u_router.get("/getUserStatistics/", verifyToken, getUserStatistics);
+u_router.get("/getAdminStatistics/", verifyToken, getAdminStatistics);
 
 
 module.exports = {
