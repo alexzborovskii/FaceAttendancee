@@ -8,6 +8,7 @@ import AddUser from './components/AddUser';
 import Samples from './components/Samples';
 import LogIn from './components/Login';
 import Register from './components/Register';
+import Statistics from './components/Statistics';
 
 
 export const AppContext = createContext(null);
@@ -22,6 +23,7 @@ function App() {
     <div className="App">
       <Routes>
         <Route path='/' element={<Auth><AccountScreen /><Samples /></Auth>} />
+        <Route path='/statistics' element={<Auth><Statistics /></Auth>} />
         <Route path='/videocapture' element={<Auth><VideoCapture /></Auth>} />
         <Route path='/adduser' element={<Auth><AddUser /> </Auth>} />
         <Route path='/login' element={<LogIn />}/>

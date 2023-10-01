@@ -38,6 +38,9 @@ const Nav = (props) => {
             <Button component={Link} to="/adduser">
                 Add User
             </Button>
+            <Button component={Link} to="/statistics">
+                Statistics
+            </Button>
             <Button component={Link} to="/videocapture">
                 VideoCapture
             </Button>

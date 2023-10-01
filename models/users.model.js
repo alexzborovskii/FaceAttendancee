@@ -43,7 +43,6 @@ const _getSamplesAndUser = ({ user_id }) => {
 };
 
 const _delUserSample = ({ publicid }) => {
-    console.log("publicid in models: ", publicid);
     return db("samples").where({ publicid }).del().returning();
 };
 
@@ -64,6 +63,13 @@ const _postDetection = (fieldsToInsert) => {
         .returning(["user_id", "time"]);
 };
 
+const _getUserStatistics = ({user_id}) => {
+    return db("detections as d")
+    .join("users as u", "u.user_id", "d.user_id")
+    .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
+    .where({ "u.user_id": user_id });
+} 
+
 
 module.exports = {
     _register,
@@ -77,4 +83,5 @@ module.exports = {
     _putDescriptors,
     _getAllDescriptors,
     _postDetection,
+    _getUserStatistics
 };

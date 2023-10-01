@@ -10,6 +10,7 @@ const {
     _putDescriptors,
     _getAllDescriptors,
     _postDetection,
+    _getUserStatistics,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -83,7 +84,7 @@ const getUserInfo = async (req, res) => {
     const id = req.user.userId;
     const user = await _getUserInfo(id);
     if (!user) return res.status(404).json({ msg: "User not found" });
-    const userArr = Object.keys(user[0]); 
+    const userArr = Object.keys(user[0]);
     userArr.forEach((key) => {
         if (user[0][key] === null) {
             user[0][key] = "";
@@ -252,6 +253,31 @@ const postDetection = async (req, res) => {
     }
 };
 
+const getUserStatistics = async (req, res) => {
+    try {
+        const user_id = req.user.userId;
+        const data = await _getUserStatistics({ user_id });
+        const cleanedData = data.map((row) => {
+            const detection_id = row.detection_id;
+            const user_id = row.user_id;
+            const name = `${row.fname} ${row.lname}`
+            const time = row.time.toLocaleTimeString("en-US", { hour12: false });
+            const date =  `${row.time.getFullYear()}-${row.time.getMonth()+1}-${row.time.getDate()}`;
+            
+            return {detection_id, user_id, name, date, time,  }
+        })
+        console.log("cleanedData: ", cleanedData)
+        res.status(200).json(cleanedData);
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get your statistcs",
+        });
+    }
+}
+
+
+
 module.exports = {
     register,
     login,
@@ -263,5 +289,6 @@ module.exports = {
     putDescriptors,
     putUserInfo,
     getDescriptors,
-    postDetection
+    postDetection,
+    getUserStatistics
 };
