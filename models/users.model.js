@@ -1,4 +1,6 @@
 const { db } = require("../config/db.js");
+const { attachPaginate } = require("knex-paginate");
+attachPaginate();
 
 const _register = (lname, fname, email, password) => {
     return db("users")
@@ -16,7 +18,7 @@ const _getUserInfo = (userId) => {
         .where({ user_id: userId });
 };
 
-const _putUserInfo = ({user_id, fname, lname, email}) => {
+const _putUserInfo = ({ user_id, fname, lname, email }) => {
     return db("users")
         .update({ fname, lname, email })
         .where({ user_id })
@@ -46,12 +48,12 @@ const _delUserSample = ({ publicid }) => {
     return db("samples").where({ publicid }).del().returning();
 };
 
-const _putDescriptors = ({descriptors, user_id}) => {
+const _putDescriptors = ({ descriptors, user_id }) => {
     return db("users")
-    .update({ descriptors })
-    .where({ user_id })
-    .returning(["fname", "lname", "email", "descriptors"]);
-}
+        .update({ descriptors })
+        .where({ user_id })
+        .returning(["fname", "lname", "email", "descriptors"]);
+};
 
 const _getAllDescriptors = () => {
     return db("users").select("descriptors");
@@ -63,13 +65,24 @@ const _postDetection = (fieldsToInsert) => {
         .returning(["user_id", "time"]);
 };
 
-const _getUserStatistics = ({user_id}) => {
+const _getUserStatistics = ({ user_id, perPage, currentPage }) => {
     return db("detections as d")
-    .join("users as u", "u.user_id", "d.user_id")
-    .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
-    .where({ "u.user_id": user_id });
-} 
+        .join("users as u", "u.user_id", "d.user_id")
+        .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
+        .where({ "u.user_id": user_id })
+        .orderBy("d.detection_id", "desc")
+        .paginate({
+            perPage,
+            currentPage,
+        });
 
+    };
+
+    const _getUserStatisticsTotal = ({user_id}) => {
+        return db("detections as d")
+        .count("detection_id")
+        .where({ user_id })
+    }
 
 module.exports = {
     _register,
@@ -83,5 +96,6 @@ module.exports = {
     _putDescriptors,
     _getAllDescriptors,
     _postDetection,
-    _getUserStatistics
+    _getUserStatistics,
+    _getUserStatisticsTotal
 };

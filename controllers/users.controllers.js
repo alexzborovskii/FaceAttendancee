@@ -11,6 +11,7 @@ const {
     _getAllDescriptors,
     _postDetection,
     _getUserStatistics,
+    _getUserStatisticsTotal,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -255,9 +256,17 @@ const postDetection = async (req, res) => {
 
 const getUserStatistics = async (req, res) => {
     try {
+        //for pagination
+        let { page, limit } = req.query
+        if (!page) page = 0
+        if (!limit) limit = 10
+        page = parseInt(page)
+        limit = parseInt(limit)
+        //function
         const user_id = req.user.userId;
-        const data = await _getUserStatistics({ user_id });
-        const cleanedData = data.map((row) => {
+        const data = await _getUserStatistics({ user_id, perPage: limit, currentPage: page+1 });
+        const totalObj = await _getUserStatisticsTotal({ user_id });
+        const cleanedData = data.data.map((row) => {
             const detection_id = row.detection_id;
             const user_id = row.user_id;
             const name = `${row.fname} ${row.lname}`
@@ -266,8 +275,7 @@ const getUserStatistics = async (req, res) => {
             
             return {detection_id, user_id, name, date, time,  }
         })
-        console.log("cleanedData: ", cleanedData)
-        res.status(200).json(cleanedData);
+        res.status(200).json({data: cleanedData, total: Number(totalObj[0].count)});
     } catch (error) {
         console.error(error);
         res.status(404).json({
