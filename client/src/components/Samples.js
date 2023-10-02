@@ -9,6 +9,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AppContext } from "../App.js";
 import { Image } from "cloudinary-react";
 
+
 const Samples = (props) => {
     const [fileInputState, setFileInputState] = useState("");
     const [previewSource, setPreviewSource] = useState("");
@@ -151,6 +152,40 @@ const Samples = (props) => {
                 >
                     Send
                 </Button>
+            </form>
+            {}
+            {previewSource && (
+                <img
+                    src={previewSource}
+                    alt="chosen"
+                    style={{ height: "300px" }}
+                />
+            )}
+            <div id="samples-box" style={{display:"flex", flexWrap:"wrap"}}>
+            </div>
+            {publicIDs &&
+                publicIDs.map((idObj, index) => {
+                    return (
+                        <div style={{display: "inline-block", margin:"10px"}} key={index}>
+                            <Image
+                                cloudName={process.env.REACT_APP_CLOUDINARY_NAME}
+                                publicId={idObj.publicid}
+                                width="150"
+                                crop="scale"
+                                sx={{borderRadius: "5px"}}
+                            />
+                            <br />
+                            <Button
+                                className="btn"
+                                size="small"
+                                variant="contained"
+                                startIcon={<DeleteForever />}
+                                onClick={() => deleteImage(index)}>
+                                Delete image
+                            </Button>
+                        </div>
+                    );
+                })}
                 <Button
                     className="btn"
                     sx={{ mt: 3, mb: 2, ml: 2 }}
@@ -164,38 +199,6 @@ const Samples = (props) => {
                     onClick={() => generateDescriptors(userId)}>
                     Generate recognition
                 </Button>
-            </form>
-            {}
-            {previewSource && (
-                <img
-                    src={previewSource}
-                    alt="chosen"
-                    style={{ height: "300px" }}
-                />
-            )}
-            {publicIDs &&
-                publicIDs.map((idObj, index) => {
-                    return (
-                        <div key={index}>
-                            <Image
-                                // cloudName={process.env.REACT_APP_CLOUDINARY_NAME}
-                                cloudName="dte0xrn6r"
-                                publicId={idObj.publicid}
-                                width="300"
-                                crop="scale"
-                            />
-                            <br />
-                            <Button
-                                className="btn"
-                                sx={{ mt: 3, mb: 2, ml: 2 }}
-                                variant="contained"
-                                startIcon={<DeleteForever />}
-                                onClick={() => deleteImage(index)}>
-                                Delete image
-                            </Button>
-                        </div>
-                    );
-                })}
         </div>
     );
 };
