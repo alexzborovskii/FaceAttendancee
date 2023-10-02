@@ -3,9 +3,6 @@ import { Auth } from './auth/Auth';
 import {Routes, Route} from 'react-router-dom'
 import VideoCapture from './components/VideoCapture';
 import Nav from './components/Nav';
-import AccountScreen from './components/AccountScreen';
-// import AddUser from './components/AddUser';
-import Samples from './components/Samples';
 import LogIn from './components/Login';
 import Register from './components/Register';
 import Statistics from './components/Statistics';
@@ -22,7 +19,7 @@ function App() {
       <Nav />
     <div className="App">
       <Routes>
-        <Route path='/account' element={<AccountDashboard />}/>
+        <Route path='/' element={<AccountDashboard />}/>
         <Route path='/statistics' element={<Auth><Statistics /></Auth>} />
         <Route path='/adminStatistics' element={<Auth><AdminStatistics /> </Auth>} />
         <Route path='/videocapture' element={<Auth><VideoCapture /></Auth>} />

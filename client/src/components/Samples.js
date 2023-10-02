@@ -1,6 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import AlertMsg from "./Alert";
 import { Button } from "@mui/material";
+import { Typography, Box, useTheme } from "@mui/material";
+import { tokens } from "../theme";
+
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import SendIcon from "@mui/icons-material/Send";
@@ -8,7 +11,6 @@ import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AppContext } from "../App.js";
 import { Image } from "cloudinary-react";
-
 
 const Samples = (props) => {
     const [fileInputState, setFileInputState] = useState("");
@@ -19,6 +21,9 @@ const Samples = (props) => {
     const [publicIDs, setPublicIDs] = useState([]);
 
     const { userId } = useContext(AppContext);
+
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
 
     useEffect(() => {
         getUserSamples();
@@ -67,17 +72,13 @@ const Samples = (props) => {
 
     const uploadImage = async (base64EncodedImage) => {
         try {
-            console.log("userId: ", userId);
-
             const res = await fetch("/api/users/upload", {
                 method: "POST",
                 body: JSON.stringify({ data: base64EncodedImage }),
                 headers: { "Content-Type": "application/json" },
             });
-            console.log("res: ", res);
             const userImages = await res.json();
 
-            console.log("uploadedData: ", userImages.msg);
             setPublicIDs(userImages.msg);
 
             console.log("publicIDs: ", publicIDs);
@@ -98,7 +99,7 @@ const Samples = (props) => {
                     method: "DELETE",
                 }
             );
-            const data = await res.json();
+            // const data = await res.json();
             const newPublickIDs = [...publicIDs];
             newPublickIDs.splice(index, 1);
             setPublicIDs(newPublickIDs);
@@ -111,13 +112,13 @@ const Samples = (props) => {
         try {
             const res = await fetch(`/api/users/putdescripters/`);
             const data = await res.json();
-            console.log("DATA: ", data)
+            console.log("DATA: ", data);
             setSuccessMsg("Generated successfully");
         } catch (error) {
             console.error(error);
             setErrMsg("Something went wrong! Descriptors not generated!");
         }
-    }
+    };
 
     return (
         <div>
@@ -155,40 +156,62 @@ const Samples = (props) => {
             </form>
             {}
             {previewSource && (
-                <img
-                    src={previewSource}
-                    alt="chosen"
-                    style={{ height: "300px" }}
-                />
+                <div>
+                    <Typography
+                        variant="h6"
+                        color={colors.grey[100]}
+                        sx={{ m: "0 0 5px 0" }}
+                        mb="10px">
+                        Preview the image:
+                    </Typography>
+                    <img
+                        src={previewSource}
+                        alt="chosen"
+                        style={{ height: "300px" }}
+                    />
+                </div>
             )}
-            <div id="samples-box" style={{display:"flex", flexWrap:"wrap"}}>
+            <div
+                id="samples-box"
+                style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                }}>
+                {publicIDs &&
+                    publicIDs.map((idObj, index) => {
+                        return (
+                            <div
+                                style={{
+                                    display: "inline-block",
+                                    margin: "10px",
+                                }}
+                                key={index}>
+                                <Image
+                                    cloudName={
+                                        process.env.REACT_APP_CLOUDINARY_NAME
+                                    }
+                                    publicId={idObj.publicid}
+                                    width="150"
+                                    crop="scale"
+                                    sx={{ borderRadius: "5px" }}
+                                />
+                                <br />
+                                <Button
+                                    className="btn"
+                                    size="small"
+                                    variant="contained"
+                                    startIcon={<DeleteForever />}
+                                    onClick={() => deleteImage(index)}>
+                                    Delete image
+                                </Button>
+                            </div>
+                        );
+                    })}
             </div>
-            {publicIDs &&
-                publicIDs.map((idObj, index) => {
-                    return (
-                        <div style={{display: "inline-block", margin:"10px"}} key={index}>
-                            <Image
-                                cloudName={process.env.REACT_APP_CLOUDINARY_NAME}
-                                publicId={idObj.publicid}
-                                width="150"
-                                crop="scale"
-                                sx={{borderRadius: "5px"}}
-                            />
-                            <br />
-                            <Button
-                                className="btn"
-                                size="small"
-                                variant="contained"
-                                startIcon={<DeleteForever />}
-                                onClick={() => deleteImage(index)}>
-                                Delete image
-                            </Button>
-                        </div>
-                    );
-                })}
+            <div style={{ display: "flex", justifyContent: "center" }}>
                 <Button
                     className="btn"
-                    sx={{ mt: 3, mb: 2, ml: 2 }}
+                    // sx={{ mt: 3, mb: 2, ml: 2,  }}
                     variant="contained"
                     endIcon={
                         <>
@@ -199,6 +222,7 @@ const Samples = (props) => {
                     onClick={() => generateDescriptors(userId)}>
                     Generate recognition
                 </Button>
+            </div>
         </div>
     );
 };

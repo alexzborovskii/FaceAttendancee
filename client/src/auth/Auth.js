@@ -17,7 +17,7 @@ export const Auth = (props) => {
                         'x-access-token': token?.token
                     }
                 });
-                if(res.status==200) {
+                if(res.status===200) {
                     setRedirect(true);
                 }
             } catch (err) {
