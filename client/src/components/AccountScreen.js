@@ -55,9 +55,9 @@ const AccountScreen = () => {
             <h2>Edit profile</h2>
             <Box
                 component="form"
-                onSubmit={() => updateInfo(userId)} 
+                onSubmit={() => updateInfo(userId)}
                 noValidate
-                sx={{ mt: 1, width: "50%" }}>
+                sx={{ mt: 1 }}>
                 <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
                     <TextField
                         type="text"

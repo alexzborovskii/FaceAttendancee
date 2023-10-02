@@ -10,7 +10,7 @@ import LogIn from './components/Login';
 import Register from './components/Register';
 import Statistics from './components/Statistics';
 import AdminStatistics from './components/AdminStatistics';
-
+import AccountDashboard from './components/AccountDashboard';
 export const AppContext = createContext(null);
 
 
@@ -22,10 +22,10 @@ function App() {
       <Nav />
     <div className="App">
       <Routes>
-        <Route path='/' element={<Auth><AccountScreen /><Samples /></Auth>} />
+        <Route path='/account' element={<AccountDashboard />}/>
         <Route path='/statistics' element={<Auth><Statistics /></Auth>} />
-        <Route path='/videocapture' element={<Auth><VideoCapture /></Auth>} />
         <Route path='/adminStatistics' element={<Auth><AdminStatistics /> </Auth>} />
+        <Route path='/videocapture' element={<Auth><VideoCapture /></Auth>} />
         <Route path='/login' element={<LogIn />}/>
         <Route path='/register' element={<Register />}/>
       </Routes>

@@ -168,7 +168,7 @@ const VideoCapture = () => {
                                     if (
                                         !recentlyRecognized.find(
                                             (item) =>
-                                                item.user_id ==
+                                                item.user_id ===
                                                 buffer[buffInd].label
                                         )
                                     ) {
@@ -230,7 +230,7 @@ const VideoCapture = () => {
                                 const buffCleanIndex = buffer.findIndex(
                                     (item) => item.label == recognition.user_id
                                 );
-                                if (buffCleanIndex != -1) {
+                                if (buffCleanIndex !== -1) {
                                     buffer.splice(buffCleanIndex, 1);
                                 }
                             });

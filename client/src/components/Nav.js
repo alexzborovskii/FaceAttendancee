@@ -32,8 +32,8 @@ const Nav = (props) => {
 
     return (
         <Stack spacing={2} direction={"row"}>
-            <Button component={Link} to="/">
-                My Account
+            <Button component={Link} to="/account">
+                My Dashboard
             </Button>
             <Button component={Link} to="/adminStatistics">
                 Admin Statistics
