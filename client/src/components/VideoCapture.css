@@ -5,13 +5,11 @@
   
   .appcanvas{
     position: absolute;
-    top: 125px;
+    top: 180px;
   }
   
   .myapp{
     display: flex;
-    width: 100vw;
-    height: 100vh;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
