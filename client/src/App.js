@@ -12,6 +12,7 @@ import Register from "./components/Register";
 import Statistics from "./components/Statistics";
 import AdminStatistics from "./components/AdminStatistics";
 import AccountDashboard from "./components/AccountDashboard";
+import LayoutFilter from "./auth/LayoutFilter.js";
 export const AppContext = createContext(null);
 
 function App() {
@@ -24,11 +25,11 @@ function App() {
             <AppContext.Provider value={{ token, setToken }}>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
-                    <div className="App">
-                        <Sidebar isSidebar={isSidebar} />
+                    <div className="app">
+                    <LayoutFilter><Sidebar isSidebar={isSidebar} /></LayoutFilter>
 
                         <main className="content">
-                            <Topbar setIsSidebar={setIsSidebar} />
+                        <LayoutFilter><Topbar setIsSidebar={setIsSidebar} /></LayoutFilter>
 
                             <Routes>
                                 <Route

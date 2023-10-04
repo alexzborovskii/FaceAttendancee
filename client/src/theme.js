@@ -82,7 +82,7 @@ export const tokens = (mode) => ({
           600: "#1F2A40",
           700: "#727681",
           800: "#a1a4ab",
-          900: "#d0d1d5",
+          900: "#6870fa", 
         },
         greenAccent: {
           100: "#0f2922",
@@ -130,7 +130,7 @@ export const themeSettings = (mode) => {
         ? {
             // palette values for dark mode
             primary: {
-              main: colors.primary[500],
+              main: colors.primary[400],
             },
             secondary: {
               main: colors.greenAccent[500],
@@ -147,7 +147,7 @@ export const themeSettings = (mode) => {
         : {
             // palette values for light mode
             primary: {
-              main: colors.primary[100],
+              main: colors.primary[900],
             },
             secondary: {
               main: colors.greenAccent[500],
@@ -164,7 +164,7 @@ export const themeSettings = (mode) => {
     },
     typography: {
       fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-      fontSize: 14,
+      fontSize: 16,
       h1: {
         fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
         fontSize: 40,
@@ -179,15 +179,15 @@ export const themeSettings = (mode) => {
       },
       h4: {
         fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 20,
+        fontSize: 22,
       },
       h5: {
         fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 16,
+        fontSize: 20,
       },
       h6: {
         fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 14,
+        fontSize: 18,
       },
     },
   };
