@@ -19,6 +19,8 @@ import Link from "@mui/material/Link";
 // import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 // import NotificationsIcon from "@mui/icons-material/Notifications";
 // import { mainListItems, secondaryListItems } from "./listItems";
+import { useTheme } from "@mui/material";
+
 import AccountScreen from "./AccountScreen";
 import Samples from "./Samples";
 import Statistics from "./Statistics";
@@ -87,18 +89,19 @@ function Copyright(props) {
 // }));
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+// const defaultTheme = createTheme();
 
 const AccountDashboard = () => {
     const [open, setOpen] = useState(true);
+    const theme = useTheme();
+
     // const toggleDrawer = () => {
     //     setOpen(!open);
     // };
 
     return (
-        <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: "flex" }}>
-                <CssBaseline />
+                {/* <CssBaseline /> */}
                 {/* <AppBar position="absolute" open={open}>
                     <Toolbar
                         sx={{
@@ -160,7 +163,7 @@ const AccountDashboard = () => {
                         height: "100vh",
                         overflow: "auto",
                     }}>
-                    <Toolbar />
+                    {/* <Toolbar /> */}
                     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                         <Grid container spacing={3}>
                             {/* AccountScreen */}
@@ -187,7 +190,7 @@ const AccountDashboard = () => {
                                     <Samples />
                                 </Paper>
                             </Grid>
-                            {/* Statistics */}
+                            {/* Statistics
                             <Grid item xs={12}>
                                 <Paper
                                     sx={{
@@ -197,13 +200,12 @@ const AccountDashboard = () => {
                                     }}>
                                     <Statistics />
                                 </Paper>
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                         <Copyright sx={{ pt: 4 }} />
                     </Container>
                 </Box>
             </Box>
-        </ThemeProvider>
     );
 };
 
