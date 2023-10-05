@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { TextField, Button, Stack, Box } from "@mui/material";
 import { AppContext } from "../App.js";
 import AlertMsg from "./Alert";
+import Header from "./Header";
+
 
 const AccountScreen = () => {
     // account info
@@ -51,7 +53,7 @@ const AccountScreen = () => {
 
     return (
         <>
-            <h2>Edit profile</h2>
+            <Header title="Edit profile" />
             <Box
                 component="form"
                 onSubmit={() => updateInfo(userId)}

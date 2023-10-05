@@ -11,6 +11,7 @@ import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AppContext } from "../App.js";
 import { Image } from "cloudinary-react";
+import Header from "./Header";
 
 const Samples = (props) => {
     const [fileInputState, setFileInputState] = useState("");
@@ -52,7 +53,7 @@ const Samples = (props) => {
 
             if (file && file.size > maxFileSizeInKB) {
                 setIsValidSize(false);
-                setErrMsg("Image cant be bigger theb 0.5 MB")
+                setErrMsg("Image cant be bigger than 0.5 MB")
             }   else if (file && file.size <= maxFileSizeInKB){
                 setIsValidSize(true);
                 setErrMsg("")
@@ -136,12 +137,12 @@ const Samples = (props) => {
 
     return (
         <div>
-            <h1 className="title">Upload an Image</h1>
+            <Header title="Upload an image" />
             <AlertMsg msg={errMsg} type="error" />
             <AlertMsg msg={successMsg} type="success" />
             <form onSubmit={handleSubmitFile} className="form">
                 <Button
-                    sx={{ mt: 3, mb: 2 }}
+                    sx={{ mt: 1, mb: 2 }}
                     variant="contained"
                     component="label"
                     startIcon={<CloudUploadIcon />}>
@@ -161,7 +162,7 @@ const Samples = (props) => {
                     disabled={!isValidSize}
                     className="btn"
                     type="submit"
-                    sx={{ mt: 3, mb: 2, ml: 2 }}
+                    sx={{ mt: 1, mb: 2, ml: 2 }}
                     variant="contained"
                     endIcon={<SendIcon />}
                     // onClick={() => console.log("create user")}

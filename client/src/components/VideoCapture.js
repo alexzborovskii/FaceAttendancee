@@ -3,13 +3,15 @@ import * as faceapi from "face-api.js";
 import "./VideoCapture.css";
 import { unDoStringify } from "../utils/parseDescriptions";
 import axios from "axios";
+import AlertMsg from "./Alert.js";
+import { Box } from "@mui/system";
 
 const VideoCapture = () => {
     const intervalId = useRef();
     const sendIntervalId = useRef();
     const videoRef = useRef();
     const canvasRef = useRef();
-    const [lastRecognized, setLastRecognized] = useState("")
+    const [lastRecognized, setLastRecognized] = useState("");
     let streamVideo = "";
     let tracks = "";
 
@@ -88,7 +90,6 @@ const VideoCapture = () => {
     const getAllUserNames = async () => {
         try {
             const res = await axios.get("/api/users/usernames");
-            console.log("res: ", res);
             if (res.status === 200) {
                 return res.data;
             }
@@ -102,7 +103,6 @@ const VideoCapture = () => {
         try {
             const labeledFaceDescriptors = await getLabeledFaceDescriptions();
             const userNames = await getAllUserNames();
-            console.log("usernames: ", userNames);
             const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
             let displaySize = { width: "0", height: "0" };
             displaySize = {
@@ -194,14 +194,23 @@ const VideoCapture = () => {
                                             ),
                                             time: buffer[buffInd].time,
                                         });
-                                        const lastRecIndex = userNames.findIndex((item) => item.user_id === Number(
-                                            buffer[buffInd].label))
-                                        setLastRecognized(userNames[lastRecIndex]["fname"])
                                         // add to recently recognized
                                         recentlyRecognized.push({
                                             user_id: buffer[buffInd].label,
                                             ttl: 2 * 5 * 60,
                                         }); // ttl in recognition interval
+                                        //showing recognition
+                                        const lastRecIndex =
+                                            userNames.findIndex(
+                                                (item) =>
+                                                    item.user_id ===
+                                                    Number(
+                                                        buffer[buffInd].label
+                                                    )
+                                            );
+                                        setLastRecognized(
+                                            `${userNames[lastRecIndex]["fname"]} was recognized!`
+                                        );
                                     }
                                 }
                             }
@@ -219,7 +228,6 @@ const VideoCapture = () => {
                             buffer.splice(index, 1);
                         }
                     }
-                    // console.log("item", item);
                 });
 
                 /* update recently recognized here */
@@ -288,8 +296,8 @@ const VideoCapture = () => {
                     height="450"
                     className="appcanvas"
                 />
+                <AlertMsg msg={lastRecognized} type="success" />
             </div>
-            {lastRecognized}
         </div>
     );
 };
