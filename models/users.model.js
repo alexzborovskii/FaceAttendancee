@@ -100,6 +100,10 @@ const _getUserStatistics = ({ user_id, perPage, currentPage }) => {
         return db("detections as d")
         .count("detection_id")
     }
+    const _getAllUserNames = () => {
+        return db("users")
+        .select("user_id", "fname")
+    }
     
     module.exports = {
         _register,
@@ -116,5 +120,6 @@ const _getUserStatistics = ({ user_id, perPage, currentPage }) => {
     _getUserStatistics,
     _getUserStatisticsTotal,
     _getAdminStatistics,
-    _getAdminStatisticsTotal
+    _getAdminStatisticsTotal,
+    _getAllUserNames
 };

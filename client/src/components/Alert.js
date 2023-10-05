@@ -6,6 +6,8 @@ const AlertMsg = ({ msg, type, setMessage }) => {
     useEffect(() => {
         if (msg) {
             setShow(true);
+        } else {
+            setShow(false)
         }
     }, [msg]);
 

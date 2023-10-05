@@ -9,6 +9,7 @@ const VideoCapture = () => {
     const sendIntervalId = useRef();
     const videoRef = useRef();
     const canvasRef = useRef();
+    const [lastRecognized, setLastRecognized] = useState("")
     let streamVideo = "";
     let tracks = "";
 
@@ -83,11 +84,25 @@ const VideoCapture = () => {
         }
     };
 
+    // get userNamesForDisplaying
+    const getAllUserNames = async () => {
+        try {
+            const res = await axios.get("/api/users/usernames");
+            console.log("res: ", res);
+            if (res.status === 200) {
+                return res.data;
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     // RECOGNITION
     const faceMyDetect = async () => {
         try {
             const labeledFaceDescriptors = await getLabeledFaceDescriptions();
-
+            const userNames = await getAllUserNames();
+            console.log("usernames: ", userNames);
             const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
             let displaySize = { width: "0", height: "0" };
             displaySize = {
@@ -179,6 +194,9 @@ const VideoCapture = () => {
                                             ),
                                             time: buffer[buffInd].time,
                                         });
+                                        const lastRecIndex = userNames.findIndex((item) => item.user_id === Number(
+                                            buffer[buffInd].label))
+                                        setLastRecognized(userNames[lastRecIndex]["fname"])
                                         // add to recently recognized
                                         recentlyRecognized.push({
                                             user_id: buffer[buffInd].label,
@@ -253,22 +271,25 @@ const VideoCapture = () => {
     };
 
     return (
-        <div className="myapp">
-            <h1>Face Detection</h1>
-            <div className="appvideo">
-                <video
-                    crossOrigin="anonymous"
-                    ref={videoRef}
-                    width="640px"
-                    height="480px"
-                    autoPlay></video>
+        <div id="video-root">
+            <div className="myapp">
+                <h1>Face Detection</h1>
+                <div className="appvideo">
+                    <video
+                        crossOrigin="anonymous"
+                        ref={videoRef}
+                        width="640px"
+                        height="480px"
+                        autoPlay></video>
+                </div>
+                <canvas
+                    ref={canvasRef}
+                    width="600"
+                    height="450"
+                    className="appcanvas"
+                />
             </div>
-            <canvas
-                ref={canvasRef}
-                width="600"
-                height="450"
-                className="appcanvas"
-            />
+            {lastRecognized}
         </div>
     );
 };

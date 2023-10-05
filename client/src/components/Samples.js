@@ -19,6 +19,7 @@ const Samples = (props) => {
     const [successMsg, setSuccessMsg] = useState("");
     const [errMsg, setErrMsg] = useState("");
     const [publicIDs, setPublicIDs] = useState([]);
+    const [isValidSize, setIsValidSize] = useState(true);
 
     const { userId } = useContext(AppContext);
 
@@ -45,15 +46,28 @@ const Samples = (props) => {
             previewFile(file);
             setSelectedFile(file);
             setFileInputState(e.target.value);
+
+            const maxFileSizeInMB = 0.5;
+            const maxFileSizeInKB = 1024 * 1024 * maxFileSizeInMB;
+
+            if (file && file.size > maxFileSizeInKB) {
+                setIsValidSize(false);
+                setErrMsg("Image cant be bigger theb 0.5 MB")
+            }   else if (file && file.size <= maxFileSizeInKB){
+                setIsValidSize(true);
+                setErrMsg("")
+            }
         }
     };
 
     const previewFile = (file) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            setPreviewSource(reader.result);
-        };
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                setPreviewSource(reader.result);
+            };
+        }
     };
 
     const handleSubmitFile = (e) => {
@@ -123,7 +137,7 @@ const Samples = (props) => {
     return (
         <div>
             <h1 className="title">Upload an Image</h1>
-            <AlertMsg msg={errMsg} type="danger" />
+            <AlertMsg msg={errMsg} type="error" />
             <AlertMsg msg={successMsg} type="success" />
             <form onSubmit={handleSubmitFile} className="form">
                 <Button
@@ -144,6 +158,7 @@ const Samples = (props) => {
                     />
                 </Button>
                 <Button
+                    disabled={!isValidSize}
                     className="btn"
                     type="submit"
                     sx={{ mt: 3, mb: 2, ml: 2 }}

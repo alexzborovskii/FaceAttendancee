@@ -13,6 +13,7 @@ const {
     _getUserStatisticsTotal,
     _getAdminStatistics,
     _getAdminStatisticsTotal,
+    _getAllUserNames,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -296,6 +297,15 @@ const getAdminStatistics = async (req, res) => {
     }
 };
 
+const getUserNames = async (req, res) => {
+    try {
+        const users = await _getAllUserNames();
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 module.exports = {
     register,
     login,
@@ -310,4 +320,5 @@ module.exports = {
     postDetection,
     getUserStatistics,
     getAdminStatistics,
+    getUsernames: getUserNames
 };
