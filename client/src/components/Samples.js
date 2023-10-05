@@ -21,6 +21,7 @@ const Samples = (props) => {
     const [errMsg, setErrMsg] = useState("");
     const [publicIDs, setPublicIDs] = useState([]);
     const [isValidSize, setIsValidSize] = useState(true);
+    const [sampleExists, setSampleExists] = useState(true)
 
     const { userId } = useContext(AppContext);
 
@@ -30,6 +31,15 @@ const Samples = (props) => {
     useEffect(() => {
         getUserSamples();
     }, []);
+
+    useEffect(() => {
+        if (publicIDs.length < 1){
+            setSampleExists(false)
+        } else {
+            setSampleExists(true)
+        }
+    }, [publicIDs])
+
 
     const getUserSamples = async () => {
         try {
@@ -95,8 +105,6 @@ const Samples = (props) => {
             const userImages = await res.json();
 
             setPublicIDs(userImages.msg);
-
-            console.log("publicIDs: ", publicIDs);
             setFileInputState("");
             setPreviewSource("");
             setSuccessMsg("Image uploaded successfully");
@@ -226,8 +234,9 @@ const Samples = (props) => {
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
                 <Button
+                    disabled={!sampleExists}
                     className="btn"
-                    // sx={{ mt: 3, mb: 2, ml: 2,  }}
+                    sx={{ mt: 3, mb: 2, ml: 2,  }}
                     variant="contained"
                     endIcon={
                         <>

@@ -4,7 +4,10 @@ import "./VideoCapture.css";
 import { unDoStringify } from "../utils/parseDescriptions";
 import axios from "axios";
 import AlertMsg from "./Alert.js";
-import { Box } from "@mui/system";
+import { useTheme } from "@mui/material";
+import { themeSettings } from "../theme";
+import { tokens } from "../theme";
+
 
 const VideoCapture = () => {
     const intervalId = useRef();
@@ -199,6 +202,7 @@ const VideoCapture = () => {
                                             user_id: buffer[buffInd].label,
                                             ttl: 2 * 5 * 60,
                                         }); // ttl in recognition interval
+
                                         //showing recognition
                                         const lastRecIndex =
                                             userNames.findIndex(

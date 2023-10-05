@@ -1,18 +1,23 @@
-.appvideo{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .appcanvas{
-    position: absolute;
-    top: 180px;
-  }
-  
-  .myapp{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-  }
+#video-root {
+  transition: "all 0.8s ease";
+  WebkitTransition: "all 0.8s ease";
+  MozTransition: "all 0.8s ease";
+}
 
+.appvideo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appcanvas {
+  position: absolute;
+  top: 180px;
+}
+
+.myapp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
