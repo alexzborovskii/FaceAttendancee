@@ -44,6 +44,7 @@ const ChangePassword = () => {
                 body: JSON.stringify({
                     password,
                     newPassword,
+                    newPassword2,
                 }),
                 headers: { "Content-Type": "application/json" },
             });

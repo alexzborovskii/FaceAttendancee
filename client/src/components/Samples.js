@@ -154,7 +154,7 @@ const Samples = (props) => {
                     variant="contained"
                     component="label"
                     startIcon={<CloudUploadIcon />}>
-                    Upload Image
+                    Choose an image
                     <input
                         id="fileInput"
                         name="image"
@@ -175,7 +175,7 @@ const Samples = (props) => {
                     endIcon={<SendIcon />}
                     // onClick={() => console.log("create user")}
                 >
-                    Send
+                    Upload
                 </Button>
             </form>
             {}
@@ -201,7 +201,7 @@ const Samples = (props) => {
                     display: "flex",
                     flexWrap: "wrap",
                 }}>
-                {publicIDs &&
+                {publicIDs !=="not authorized" &&
                     publicIDs.map((idObj, index) => {
                         return (
                             <div

@@ -8,7 +8,6 @@ import { useTheme } from "@mui/material";
 import { themeSettings } from "../theme";
 import { tokens } from "../theme";
 
-
 const VideoCapture = () => {
     const intervalId = useRef();
     const sendIntervalId = useRef();
@@ -118,8 +117,10 @@ const VideoCapture = () => {
             let recentlyRecognized = [];
 
             // RECOGNITION LOOP
+            if (!canvasRef.current) return;
             const detInt = setInterval(async () => {
                 // RECOGNIZE
+
                 intervalId.current = detInt;
                 canvasRef.current &&
                     faceapi.matchDimensions(canvasRef.current, displaySize);
@@ -274,7 +275,7 @@ const VideoCapture = () => {
         } catch (error) {
             console.error(error);
             intervalId.current && clearInterval(intervalId.current);
-            tracks && stopVideo();
+            tracks && stopVideo();  
         }
     };
 

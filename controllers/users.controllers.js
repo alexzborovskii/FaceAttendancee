@@ -57,7 +57,7 @@ const login = async (req, res) => {
             httpOnly: true,
             maxAge: 60 * 60 * 1000,
         });
-        //resp with token and uesrId
+        //resp with token
         res.json({ token: accessToken });
     } catch (err) {
         console.log(err);
@@ -68,7 +68,12 @@ const login = async (req, res) => {
 const ChangePassword = async (req, res) => {
     try {
         const user_id = req.user.userId;
-        const {password, newPassword} = req.body;
+        const { password, newPassword, newPassword2 } = req.body;
+
+        if (newPassword !== newPassword2)
+            return res
+                .status(404)
+                .json({ ErrorMsg: "New passwords don`t match! Cant save it." });
 
         console.log(
             "user_id, password, newPassword: ",
@@ -89,7 +94,8 @@ const ChangePassword = async (req, res) => {
         );
         console.log("match: ", match);
 
-        if (!match) return res.status(401).json({ ErrorMsg: "Wrong password!" });
+        if (!match)
+            return res.status(401).json({ ErrorMsg: "Wrong password!" });
 
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(newPassword + "", salt);

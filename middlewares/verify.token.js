@@ -9,11 +9,27 @@ const verifyToken = (req, res, next) => {
     //verify the token
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decode) => {
         if (err) {
-            console.log(err)
+            console.log(err);
             return res.status(403).json({ msg: "verify token failed" });
         }
         req.user = decode;
-        // console.log(req)
+
+        // my secret
+        const secret = process.env.ACCESS_TOKEN_SECRET;
+        //token
+        const accessToken = jwt.sign(
+            { userId: decode.userId, email: decode.email },
+            secret,
+            {
+                expiresIn: "60m",
+            }
+        );
+        //server cookies
+        res.cookie("token", accessToken, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 1000,
+        });
+
         next();
     });
 };
