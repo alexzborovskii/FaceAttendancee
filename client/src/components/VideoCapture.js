@@ -16,6 +16,7 @@ const VideoCapture = () => {
     const [lastRecognized, setLastRecognized] = useState("");
     let streamVideo = "";
     let tracks = "";
+    let descriptorsIntervalID = 0
 
     // LOAD FROM USEEFFECT
 
@@ -24,6 +25,7 @@ const VideoCapture = () => {
         return () => {
             clearInterval(intervalId.current);
             clearInterval(sendIntervalId.current);
+            clearInterval(descriptorsIntervalID)
             tracks && stopVideo();
         };
     }, []);
@@ -103,9 +105,26 @@ const VideoCapture = () => {
     // RECOGNITION
     const faceMyDetect = async () => {
         try {
-            const labeledFaceDescriptors = await getLabeledFaceDescriptions();
-            const userNames = await getAllUserNames();
-            const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+            let labeledFaceDescriptors = [];
+            let userNames = [];
+            let faceMatcher = []
+            // get descriptors at the beginning
+            labeledFaceDescriptors = await getLabeledFaceDescriptions();
+            userNames = await getAllUserNames();
+            faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+            console.log("new usernames and faceMatchers generated first time")
+            // get descriptors in loop 
+            descriptorsIntervalID = setInterval(async () => {
+                try {
+                labeledFaceDescriptors = await getLabeledFaceDescriptions();
+                userNames = await getAllUserNames();
+                faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+                console.log("new usernames and faceMatchers generated")
+                } catch (error) {
+                    console.log(error)
+                }
+            }, 1000 * 60* 5);
+
             let displaySize = { width: "0", height: "0" };
             displaySize = {
                 width: videoRef.current.offsetWidth,
@@ -136,7 +155,7 @@ const VideoCapture = () => {
                 );
                 canvasRef.current &&
                     canvasRef.current
-                        .getContext("2d")
+                        .getContext("2d", { willReadFrequently: true })
                         .clearRect(
                             0,
                             0,
@@ -201,7 +220,7 @@ const VideoCapture = () => {
                                         // add to recently recognized
                                         recentlyRecognized.push({
                                             user_id: buffer[buffInd].label,
-                                            ttl: 2 * 5 * 60,
+                                            ttl: 2 * 1 * 60,
                                         }); // ttl in recognition interval
 
                                         //showing recognition
@@ -275,7 +294,7 @@ const VideoCapture = () => {
         } catch (error) {
             console.error(error);
             intervalId.current && clearInterval(intervalId.current);
-            tracks && stopVideo();  
+            tracks && stopVideo();
         }
     };
 

@@ -21,7 +21,7 @@ const Samples = (props) => {
     const [errMsg, setErrMsg] = useState("");
     const [publicIDs, setPublicIDs] = useState([]);
     const [isValidSize, setIsValidSize] = useState(true);
-    const [sampleExists, setSampleExists] = useState(true)
+    const [sampleExists, setSampleExists] = useState(true);
 
     const { userId } = useContext(AppContext);
 
@@ -33,14 +33,14 @@ const Samples = (props) => {
     }, []);
 
     useEffect(() => {
-        if (publicIDs.length < 1){
-            setSampleExists(false)
+        if (publicIDs.length < 1) {
+            setSampleExists(false);
         } else {
-            setSampleExists(true)
+            setSampleExists(true);
         }
-    }, [publicIDs])
+    }, [publicIDs]);
 
-
+    useEffect(() => {}, [errMsg, successMsg]);
     const getUserSamples = async () => {
         try {
             const res = await fetch(`/api/users/userSamples/`);
@@ -62,11 +62,12 @@ const Samples = (props) => {
             const maxFileSizeInKB = 1024 * 1024 * maxFileSizeInMB;
 
             if (file && file.size > maxFileSizeInKB) {
+                setErrMsg("");
                 setIsValidSize(false);
-                setErrMsg("Image cant be bigger than 0.5 MB")
-            }   else if (file && file.size <= maxFileSizeInKB){
+                setErrMsg(`Image cant be bigger than 0.5 MB. Image is ${Math.round(((file.size / (1024 * 1024))+ Number.EPSILON) * 100) / 100} MB`);
+            } else if (file && file.size <= maxFileSizeInKB) {
                 setIsValidSize(true);
-                setErrMsg("")
+                setErrMsg("");
             }
         }
     };
@@ -147,7 +148,7 @@ const Samples = (props) => {
         <div>
             <Header title="Upload an image" />
             <AlertMsg msg={errMsg} type="error" />
-            <AlertMsg msg={successMsg} type="success" />
+            <AlertMsg msg={successMsg}  type="success" />
             <form onSubmit={handleSubmitFile} className="form">
                 <Button
                     sx={{ mt: 1, mb: 2 }}
@@ -162,7 +163,6 @@ const Samples = (props) => {
                         value={fileInputState}
                         className="form-input"
                         type="file"
-                        // multiple
                         hidden
                     />
                 </Button>
@@ -201,7 +201,7 @@ const Samples = (props) => {
                     display: "flex",
                     flexWrap: "wrap",
                 }}>
-                {publicIDs !=="not authorized" &&
+                {publicIDs !== "not authorized" &&
                     publicIDs.map((idObj, index) => {
                         return (
                             <div
@@ -236,7 +236,7 @@ const Samples = (props) => {
                 <Button
                     disabled={!sampleExists}
                     className="btn"
-                    sx={{ mt: 3, mb: 2, ml: 2,  }}
+                    sx={{ mt: 3, mb: 2, ml: 2 }}
                     variant="contained"
                     endIcon={
                         <>

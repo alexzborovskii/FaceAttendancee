@@ -25,7 +25,7 @@ const AccountDashboard = () => {
                                 ? theme.palette.grey[100]
                                 : theme.palette.grey[900],
                         flexGrow: 1,
-                        height: "calc(100vh - 75px)",
+                        height: "calc(100vh - 75.43px)",
                         overflow: "auto",
                     }}>
                     <Container maxWidth={false} sx={{ mt: 4, mb: 4 }} >
