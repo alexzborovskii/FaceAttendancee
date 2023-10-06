@@ -14,6 +14,8 @@ const {
     _getAdminStatistics,
     _getAdminStatisticsTotal,
     _getAllUserNames,
+    _getPassword,
+    _putPass,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -60,6 +62,45 @@ const login = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(404).json({ msg: "something went wrong" });
+    }
+};
+
+const ChangePassword = async (req, res) => {
+    try {
+        const user_id = req.user.userId;
+        const {password, newPassword} = req.body;
+
+        console.log(
+            "user_id, password, newPassword: ",
+            user_id,
+            password,
+            newPassword
+        );
+
+        const row = await _getPassword({ user_id });
+        console.log("row: ", row);
+
+        if (row.length === 0) {
+            return res.status(404).json({ msg: "Information not found" });
+        }
+        const match = await bcrypt.compare(
+            req.body.password + "",
+            row[0].password
+        );
+        console.log("match: ", match);
+
+        if (!match) return res.status(401).json({ ErrorMsg: "Wrong password!" });
+
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(newPassword + "", salt);
+
+        const resPassSave = await _putPass({ user_id, hash });
+        console.log("new hash: ", resPassSave);
+        resPassSave.length === 0
+            ? res.status(404).json({ ErrorMsg: "Cant save your password" })
+            : res.status(200).json({ msg: "New password saved successfully" });
+    } catch (error) {
+        console.log(error);
     }
 };
 
@@ -177,10 +218,11 @@ const putDescriptors = async (req, res) => {
         let label = user_id + "";
 
         // use child process for descriptors generation and saving
-        const childProcess = fork("./utils/create_detections.js")
-        childProcess.send({samplesAndUser, label})
-        childProcess.on("message", message => res.json({data: "Generated successfully"}));
-
+        const childProcess = fork("./utils/create_detections.js");
+        childProcess.send({ samplesAndUser, label });
+        childProcess.on("message", (message) =>
+            res.json({ data: "Generated successfully" })
+        );
     } catch (error) {
         console.error(error);
     }
@@ -304,7 +346,7 @@ const getUserNames = async (req, res) => {
     } catch (error) {
         console.error(error);
     }
-}
+};
 
 module.exports = {
     register,
@@ -320,5 +362,6 @@ module.exports = {
     postDetection,
     getUserStatistics,
     getAdminStatistics,
-    getUsernames: getUserNames
+    getUserNames,
+    ChangePassword,
 };

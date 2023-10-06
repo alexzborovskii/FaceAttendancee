@@ -3,8 +3,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import Checkbox from '@mui/material/Checkbox';
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -20,33 +18,13 @@ import { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import AlertMsg from "./Alert";
 import { AppContext } from "../App";
-
-
-
-function Copyright(props) {
-    return (
-        <Typography
-        variant="body2"
-        color="text.secondary"
-            align="center"
-            {...props}>
-            {"Copyright © "}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    );
-}
+import Copyright from "./Copyright.js";
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
 const Register = () => {
-    
-    
     const [fname, setFname] = useState("");
     const [lname, setLname] = useState("");
     const [email, setEmail] = useState("");
@@ -54,17 +32,16 @@ const Register = () => {
     const [message, setMessage] = useState("");
     const { setToken, setUserId } = useContext(AppContext);
     const navigate = useNavigate();
-    
+
     useEffect(() => {
-        setMessage('')
-    },[fname, lname, email, password] )
+        setMessage("");
+    }, [fname, lname, email, password]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        
+
         try {
-            if (fname && lname && email && password){
-                
+            if (fname && lname && email && password) {
                 const res = await axios.post("/api/users/register", {
                     fname,
                     lname,
@@ -72,15 +49,15 @@ const Register = () => {
                     password,
                 });
                 if (res.status === 200) {
-                    setMessage('');
-                    navigate('/login')
+                    setMessage("");
+                    navigate("/login");
                 }
             } else {
-                setMessage('');
-                setMessage("Fields can not be empty")
+                setMessage("");
+                setMessage("Fields can not be empty");
             }
         } catch (err) {
-            setMessage(err.response.data.msg)
+            setMessage(err.response.data.msg);
         }
     };
 
@@ -132,7 +109,6 @@ const Register = () => {
                                     onChange={(e) => {
                                         setLname(e.target.value);
                                     }}
-
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -162,12 +138,6 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
-                                {/* <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                /> */}
-                            </Grid>
                         </Grid>
                         <Button
                             type="submit"
@@ -180,10 +150,8 @@ const Register = () => {
 
                         <Grid container justifyContent="flex-end">
                             <Grid item>
-                                <ReactLink
-                                    to="/login"
-                                    >
-                                        Already have an account? Sign in
+                                <ReactLink to="/login">
+                                    Already have an account? Sign in
                                 </ReactLink>
                             </Grid>
                         </Grid>

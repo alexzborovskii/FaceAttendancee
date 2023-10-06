@@ -12,6 +12,17 @@ const _login = (email) => {
     return db("users").select("user_id", "email", "password").where({ email });
 };
 
+const _getPassword = ({ user_id }) => {
+    return db("users").select("password").where({ user_id });
+};
+
+const _putPass = ({ user_id, hash }) => {
+    return db("users")
+        .update({ password: hash })
+            .where({ user_id })
+        .returning(["password"]);
+};
+
 const _getUserInfo = (userId) => {
     return db("users")
         .select("user_id", "email", "password", "fname", "lname")
@@ -75,43 +86,37 @@ const _getUserStatistics = ({ user_id, perPage, currentPage }) => {
             perPage,
             currentPage,
         });
+};
 
-    };
-    
-    const _getUserStatisticsTotal = ({user_id}) => {
-        return db("detections as d")
-        .count("detection_id")
-        .where({ user_id })
-    }
+const _getUserStatisticsTotal = ({ user_id }) => {
+    return db("detections as d").count("detection_id").where({ user_id });
+};
 
-    const _getAdminStatistics = ({  perPage, currentPage }) => {
-        return db("detections as d")
-            .join("users as u", "u.user_id", "d.user_id")
-            .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
-            .orderBy("d.detection_id", "desc")
-            .paginate({
-                perPage,
-                currentPage,
-            });
-    
-        };
+const _getAdminStatistics = ({ perPage, currentPage }) => {
+    return db("detections as d")
+        .join("users as u", "u.user_id", "d.user_id")
+        .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
+        .orderBy("d.detection_id", "desc")
+        .paginate({
+            perPage,
+            currentPage,
+        });
+};
 
-    const _getAdminStatisticsTotal = () => {
-        return db("detections as d")
-        .count("detection_id")
-    }
-    const _getAllUserNames = () => {
-        return db("users")
-        .select("user_id", "fname")
-    }
-    
-    module.exports = {
-        _register,
-        _login,
-        _getUserInfo,
-        _insertSample,
-        _getUserSamples,
-        _delUserSample,
+const _getAdminStatisticsTotal = () => {
+    return db("detections as d").count("detection_id");
+};
+const _getAllUserNames = () => {
+    return db("users").select("user_id", "fname");
+};
+
+module.exports = {
+    _register,
+    _login,
+    _getUserInfo,
+    _insertSample,
+    _getUserSamples,
+    _delUserSample,
     _getSamplesAndUser,
     _putUserInfo,
     _putDescriptors,
@@ -121,5 +126,7 @@ const _getUserStatistics = ({ user_id, perPage, currentPage }) => {
     _getUserStatisticsTotal,
     _getAdminStatistics,
     _getAdminStatisticsTotal,
-    _getAllUserNames
+    _getAllUserNames,
+    _getPassword,
+    _putPass,
 };

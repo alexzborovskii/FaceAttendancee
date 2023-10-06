@@ -12,7 +12,8 @@ const {
     postDetection,
     getUserStatistics,
     getAdminStatistics,
-    getUsernames
+    getUserNames,
+    ChangePassword
 } = require("../controllers/users.controllers.js");
 const express = require("express");
 const u_router = express.Router();
@@ -36,7 +37,8 @@ u_router.get("/getAllDescriptors/", verifyToken, getDescriptors);
 u_router.post("/postdetection/", postDetection);
 u_router.get("/getUserStatistics/", verifyToken, getUserStatistics);
 u_router.get("/getAdminStatistics/", verifyToken, getAdminStatistics);
-u_router.get("/usernames", verifyToken, getUsernames) 
+u_router.get("/usernames/", verifyToken, getUserNames) 
+u_router.put("/changePassword/", verifyToken, ChangePassword)
 
 
 module.exports = {

@@ -92,17 +92,6 @@ const AccountScreen = () => {
                     required
                     sx={{ mb: 4 }}
                 />
-                <TextField
-                    type="password"
-                    variant="standard"
-                    color="primary"
-                    label="Password"
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required
-                    fullWidth
-                    sx={{ mb: 4 }}
-                />
                 <Button
                     variant="contained"
                     component="label"

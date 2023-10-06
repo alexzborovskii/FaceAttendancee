@@ -14,6 +14,7 @@ import Statistics from "./components/Statistics";
 import AdminStatistics from "./components/AdminStatistics";
 import AccountDashboard from "./components/AccountDashboard";
 import LayoutFilter from "./auth/LayoutFilter.js";
+import ChangePassword from "./components/ChangePassword.js";
 export const AppContext = createContext(null);
 
 function App() {
@@ -83,6 +84,10 @@ function App() {
                                     <Route
                                         path="/register"
                                         element={<Register />}
+                                    />
+                                    <Route
+                                        path="/changepassword"
+                                        element={<ChangePassword />}
                                     />
                                 </Routes>
                             </main>

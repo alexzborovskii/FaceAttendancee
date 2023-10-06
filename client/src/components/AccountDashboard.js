@@ -6,26 +6,9 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
 import { useTheme } from "@mui/material";
-
 import AccountScreen from "./AccountScreen";
 import Samples from "./Samples";
-
-function Copyright(props) {
-    return (
-        <Typography
-            variant="body2"
-            color="text.secondary"
-            align="center"
-            {...props}>
-            {"Copyright © "}
-            <Link color="inherit">
-                Face Attendance
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    );
-}
+import Copyright from "./Copyright.js"
 
 
 
