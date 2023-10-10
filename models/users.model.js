@@ -19,7 +19,7 @@ const _getPassword = ({ user_id }) => {
 const _putPass = ({ user_id, hash }) => {
     return db("users")
         .update({ password: hash })
-            .where({ user_id })
+        .where({ user_id })
         .returning(["password"]);
 };
 
@@ -110,6 +110,44 @@ const _getAllUserNames = () => {
     return db("users").select("user_id", "fname");
 };
 
+const _getAdminByDayStatistics = ({ perPage, currentPage, date }) => {
+    const startOfTheDay = new Date(date.substring(0, 11) + "00:00:00.000Z");
+    const endOfTheDay = new Date(date.substring(0, 11) + "23:59:59.999Z");
+    const currDate = new Date(date)
+    console.log(
+        "startOfTheDay: ",
+        startOfTheDay,
+        " \n endOfTheDay: ",
+        endOfTheDay,
+        " \n date: ",
+        currDate
+    );
+    console.log(startOfTheDay < currDate);
+    console.log(endOfTheDay > currDate);
+
+    return db("detections as d")
+        .join("users as u", "u.user_id", "d.user_id")
+        .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
+        .orderBy("d.detection_id", "desc")
+        .where("d.time", '>=', startOfTheDay)
+        .where("d.time", '<=', endOfTheDay)
+        .paginate({
+            perPage,
+            currentPage,
+        });
+};
+
+const _getAdminByDayStatisticsTotal = ({ date }) => {
+    console.log("substring:" , date.substring(0, 11))
+    const startOfTheDay = new Date(date.substring(0, 11) + "00:00:00.000Z");
+    const endOfTheDay = new Date(date.substring(0, 11) + "23:59:59.999Z");
+
+    return db("detections as d")
+        .where("d.time", '>=', startOfTheDay)
+        .where("d.time", '<=', endOfTheDay)
+        .countDistinct("user_id");
+};
+
 module.exports = {
     _register,
     _login,
@@ -129,4 +167,6 @@ module.exports = {
     _getAllUserNames,
     _getPassword,
     _putPass,
+    _getAdminByDayStatistics,
+    _getAdminByDayStatisticsTotal,
 };

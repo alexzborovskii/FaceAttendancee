@@ -194,7 +194,7 @@ const VideoCapture = () => {
                                 const newObj = {
                                     label: result._label,
                                     time: new Date().toISOString(),
-                                    recInRow: 1,
+                                    recInRow: 1, 
                                     notRecInRow: 0,
                                 };
                                 buffer.push(newObj);

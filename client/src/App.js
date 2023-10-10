@@ -7,7 +7,6 @@ import Sidebar from "./global/Sidebar";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import VideoCapture from "./components/VideoCapture";
 import ErrorBoundary from "./components/ErrorBoundary";
-// import Nav from "./components/Nav";
 import LogIn from "./components/Login";
 import Register from "./components/Register";
 import Statistics from "./components/Statistics";
@@ -15,6 +14,7 @@ import AdminStatistics from "./components/AdminStatistics";
 import AccountDashboard from "./components/AccountDashboard";
 import LayoutFilter from "./auth/LayoutFilter.js";
 import ChangePassword from "./components/ChangePassword.js";
+import AdminByDayStatistics from "./components/AdminByDayStatistics.js";
 export const AppContext = createContext(null);
 
 function App() {
@@ -69,6 +69,14 @@ function App() {
                                         element={
                                             <Auth>
                                                 <AdminStatistics />{" "}
+                                            </Auth>
+                                        }
+                                    />
+                                    <Route
+                                        path="/adminByDayStatistics"
+                                        element={
+                                            <Auth>
+                                                <AdminByDayStatistics />{" "}
                                             </Auth>
                                         }
                                     />

@@ -8,7 +8,7 @@ const AlertMsg = ({ msg, type }) => {
         if (msg) {
             setShow(true);
             setTimeout(() => {
-                setShow(false);
+                setShow(false); 
             }, 10000);
         } else {
             setShow(false);

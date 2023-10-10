@@ -70,6 +70,7 @@ export default function SignInSide() {
             } else {
                 setMessage("");
                 setMessage("Fields can not be empty");
+                setMessage("");
             }
         } catch (err) {
             console.error(err);

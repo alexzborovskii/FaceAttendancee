@@ -91,8 +91,8 @@ const Samples = (props) => {
             uploadImage(reader.result);
         };
         reader.onerror = () => {
-            console.error("AHHHHHHHH!!");
-            setErrMsg("something went wrong!");
+            console.error("Something went wrong!");
+            setErrMsg("Something went wrong!");
         };
     };
 
@@ -212,7 +212,8 @@ const Samples = (props) => {
                                 key={index}>
                                 <Image
                                     cloudName={
-                                        process.env.REACT_APP_CLOUDINARY_NAME
+                                        // process.env.REACT_APP_CLOUDINARY_NAME
+                                        "dte0xrn6r"
                                     }
                                     publicId={idObj.publicid}
                                     width="150"

@@ -16,6 +16,8 @@ const {
     _getAllUserNames,
     _getPassword,
     _putPass,
+    _getAdminByDayStatistics,
+    _getAdminByDayStatisticsTotal,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -75,15 +77,7 @@ const ChangePassword = async (req, res) => {
                 .status(404)
                 .json({ ErrorMsg: "New passwords don`t match! Cant save it." });
 
-        console.log(
-            "user_id, password, newPassword: ",
-            user_id,
-            password,
-            newPassword
-        );
-
         const row = await _getPassword({ user_id });
-        console.log("row: ", row);
 
         if (row.length === 0) {
             return res.status(404).json({ msg: "Information not found" });
@@ -92,7 +86,6 @@ const ChangePassword = async (req, res) => {
             req.body.password + "",
             row[0].password
         );
-        console.log("match: ", match);
 
         if (!match)
             return res.status(401).json({ ErrorMsg: "Wrong password!" });
@@ -101,7 +94,7 @@ const ChangePassword = async (req, res) => {
         const hash = await bcrypt.hash(newPassword + "", salt);
 
         const resPassSave = await _putPass({ user_id, hash });
-        console.log("new hash: ", resPassSave);
+
         resPassSave.length === 0
             ? res.status(404).json({ ErrorMsg: "Cant save your password" })
             : res.status(200).json({ msg: "New password saved successfully" });
@@ -319,6 +312,7 @@ const getAdminStatistics = async (req, res) => {
             perPage: limit,
             currentPage: page + 1,
         });
+
         const totalObj = await _getAdminStatisticsTotal();
         const cleanedData = data.data.map((row) => {
             const detection_id = row.detection_id;
@@ -354,6 +348,70 @@ const getUserNames = async (req, res) => {
     }
 };
 
+const getAdminByDayStatistics = async (req, res) => {
+    try {
+        //for pagination
+        let { page, limit, date } = req.query;
+        if (!page) page = 0;
+        if (!limit) limit = 10;
+        page = parseInt(page);
+        limit = parseInt(limit);
+
+        //get data
+        const data = await _getAdminByDayStatistics({
+            perPage: limit,
+            currentPage: page + 1,
+            date,
+        });
+        // get amount of rows
+        const totalObj = await _getAdminByDayStatisticsTotal({ date });
+
+        // clean and structure the data
+        let statisticsByDay = [];
+
+        data.data.forEach((row) => {
+            const index = statisticsByDay.findIndex(
+                (item) => row.user_id === item.user_id
+            );
+            let newRow = {};
+
+            const time = row.time.toLocaleTimeString("en-US", {
+                hour12: false,
+            });
+
+            const date = `${row.time.getFullYear()}-${
+                row.time.getMonth() + 1
+            }-${row.time.getDate()}`;
+
+            if (index === -1) {
+                newRow.first_time = time;
+                newRow.last_time = time;
+                newRow.date = date;
+                newRow.name = `${row.fname} ${row.lname}`;
+                newRow.user_id = row.user_id;
+                statisticsByDay.push(newRow);
+            } else {
+                if (statisticsByDay[index].last_time < time) {
+                    statisticsByDay[index].last_time = time;
+                }
+                if (statisticsByDay[index].first_time > time) {
+                    statisticsByDay[index].first_time = time;
+                }
+            }
+        });        
+
+        res.status(200).json({
+            data: statisticsByDay,
+            total: Number(totalObj[0].count),
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get statistcs by day",
+        });
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -370,4 +428,5 @@ module.exports = {
     getAdminStatistics,
     getUserNames,
     ChangePassword,
+    getAdminByDayStatistics,
 };
