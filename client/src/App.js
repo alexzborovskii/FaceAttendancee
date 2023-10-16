@@ -15,6 +15,7 @@ import AccountDashboard from "./components/AccountDashboard";
 import LayoutFilter from "./auth/LayoutFilter.js";
 import ChangePassword from "./components/ChangePassword.js";
 import AdminByDayStatistics from "./components/AdminByDayStatistics.js";
+import StatisticsByDay from "./components/StatisticsByDay.js";
 export const AppContext = createContext(null);
 
 function App() {
@@ -61,6 +62,14 @@ function App() {
                                         element={
                                             <Auth>
                                                 <Statistics />
+                                            </Auth>
+                                        }
+                                    />
+                                    <Route
+                                        path="/statisticsByDay"
+                                        element={
+                                            <Auth>
+                                                <StatisticsByDay />
                                             </Auth>
                                         }
                                     />

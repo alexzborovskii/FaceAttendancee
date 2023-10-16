@@ -10,7 +10,6 @@ import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import PasswordIcon from "@mui/icons-material/Password";
-import AdminByDayStatistics from "../components/AdminByDayStatistics";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -123,7 +122,7 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Row by day"
+              title="By day"
               to="/statisticsByDay"
               icon={<ContactsOutlinedIcon />}
               selected={selected}

@@ -11,54 +11,40 @@ import { useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
+import dateTime from "../utils/dateTime.js";
 
-import dateTime from "../utils/dateTime.js"
-
-const AdminByDayStatistics = () => {
-    
-    
+const StatisticsByDay = () => {
     const [pageState, setPageState] = useState({
         isLoading: false,
         data: [],
         total: 0,
     });
-    
+
     const [date, setDate] = useState(dateTime(new Date()));
-    const [user, setUser] = useState("");
     const [monthYear, setMonthYear] = useState(dateTime(new Date()));
     const [userLabels, setUserLabels] = useState([]);
     const [identifier, setIdentifier] = useState("user_id");
-    const [pageSizeArrayState, setPageSizeArrayState] = useState([])
+    // const [pageSizeArrayState, setPageSizeArrayState] = useState([]);
     let source = "date";
     useEffect(() => {
         getUserLabels();
     }, []);
-    
+
     useEffect(() => {
         source = "date";
     }, [date]);
-    
+
     useEffect(() => {
-        if (user && monthYear) source = "user";
-    }, [monthYear, user]);
-    
+        source = "user";
+    }, [monthYear]);
+
     useEffect(() => {
         if (source === "date") {
-            setPageSizeArrayState([]);
-            getAdminByDayStatistics();
+            getStatisticsByDay();
         } else if (source === "user") {
-            setPageSizeArrayState([]);
-            getAdminByUserStatistics();
+            getStatisticsByUser();
         }
-    }, [
-        date,
-        user,
-        monthYear,
-    ]);
+    }, [date, monthYear]);
 
     const getUserLabels = async () => {
         try {
@@ -69,16 +55,16 @@ const AdminByDayStatistics = () => {
         }
     };
 
-    const getAdminByUserStatistics = async (event) => {
+    const getStatisticsByUser = async (event) => {
         try {
             setIdentifier("index");
             setPageState((old) => ({ ...old, isLoading: true }));
             const res = await axios(
-                `/api/users/AdminByUserStatistics?userId=${user}&monthYear=${monthYear}`
+                `/api/users/StatisticsByUser?monthYear=${monthYear}`
             );
             const data = res.data.data;
             const total = res.data.total;
-            setPageState((old) => ({
+            setPageState((old) => ({ 
                 ...old,
                 isLoading: false,
                 data,
@@ -89,14 +75,12 @@ const AdminByDayStatistics = () => {
         }
     };
 
-    const getAdminByDayStatistics = async () => {
+    const getStatisticsByDay = async () => {
         try {
             setIdentifier("user_id");
             setPageState((old) => ({ ...old, isLoading: true }));
-            console.log("date: ", date)
-            const res = await axios(
-                `/api/users/AdminByDayStatistics?date=${date}`
-            );
+            console.log("date: ", date);
+            const res = await axios(`/api/users/StatisticsByDay?date=${date}`);
             const data = res.data.data;
             console.log("day data: ", data);
             const total = res.data.total;
@@ -167,51 +151,23 @@ const AdminByDayStatistics = () => {
                     />
                 </LocalizationProvider>
                 <Typography sx={{ display: "inline-block" }}>OR</Typography>
-                <Box>
-                    <FormControl
-                        sx={{
-                            m: 1,
-                            minWidth: 120,
-                        }}>
-                        <InputLabel id="select-helper-label">User</InputLabel>
-                        <Select
-                            labelId="select-label"
-                            id="userselect-helper"
-                            value={user}
-                            label="User"
-                            onChange={(e) => setUser(e.target.value)}>
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            {userLabels &&
-                                userLabels.map((label, index) => {
-                                    return (
-                                        <MenuItem
-                                            value={label.value}
-                                            key={index}>
-                                            {label.fullName}
-                                        </MenuItem>
-                                    );
-                                })}
-                        </Select>
-                    </FormControl>
-                    <LocalizationProvider
-                        dateAdapter={AdapterDayjs}
-                        components={["DatePicker"]}>
-                        <DatePicker
-                            sx={{ m: 1 }}
-                            label={'Month and year"'}
-                            views={["month", "year"]}
-                            defaultValue={dayjs(date)}
-                            autoOk={true}
-                            hintText="Select Month"
-                            value={dayjs(date)}
-                            onChange={(e) => {
-                                setMonthYear(e.$d.toISOString());
-                            }}
-                        />
-                    </LocalizationProvider>
-                </Box>
+
+                <LocalizationProvider
+                    dateAdapter={AdapterDayjs}
+                    components={["DatePicker"]}>
+                    <DatePicker
+                        sx={{ m: 1 }}
+                        label={'Month and year"'}
+                        views={["month", "year"]}
+                        defaultValue={dayjs(date)}
+                        autoOk={true}
+                        hintText="Select Month"
+                        value={dayjs(date)}
+                        onChange={(e) => {
+                            setMonthYear(dateTime(e.$d));
+                        }}
+                    />
+                </LocalizationProvider>
             </Box>
 
             <Box
@@ -256,7 +212,6 @@ const AdminByDayStatistics = () => {
                     loading={pageState.isLoading}
                     pageSizeOptions={[]}
                     pagination
-
                     columns={columns}
                 />
             </Box>
@@ -264,4 +219,4 @@ const AdminByDayStatistics = () => {
     );
 };
 
-export default AdminByDayStatistics;
+export default StatisticsByDay;

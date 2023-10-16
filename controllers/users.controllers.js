@@ -20,6 +20,9 @@ const {
     _getAdminByDayStatisticsTotal,
     _getUserLabels,
     _getAdminByUserStatistics,
+    _getStatisticsByDay,
+    _getStatisticsTotalByDay,
+    _getStatisticsByUser,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -350,23 +353,30 @@ const getUserNames = async (req, res) => {
     }
 };
 
+const getUserLabels = async (req, res) => {
+    try {
+        const users = await _getUserLabels();
+        const labels = users.map((user) => {
+            return {
+                fullName: `${user.lname} ${user.fname}`,
+                value: user.user_id,
+            };
+        });
+        res.json(labels);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 const getAdminByDayStatistics = async (req, res) => {
     try {
-        console.log("BY DAY controller")
-        // //for pagination
-        // let { page, limit, date } = req.query;
-        // if (!page) page = 0;
-        // if (!limit) limit = 10;
-        // page = parseInt(page);
-        // limit = parseInt(limit);
-        
         //get data
         let { date } = req.query;
-        console.log("date in cotroller before model: ", date)
+        console.log("date in cotroller before model: ", date);
         const data = await _getAdminByDayStatistics({
             date,
         });
-        console.log("data in controller: ", data)
+        console.log("data in controller: ", data);
         // get amount of rows
         const totalObj = await _getAdminByDayStatisticsTotal({ date });
 
@@ -379,8 +389,10 @@ const getAdminByDayStatistics = async (req, res) => {
             );
             let newRow = {};
 
-            const time = row.time.toLocaleTimeString('en-Gb',
-            { hour12: false, timeZone: 'UTC' });
+            const time = row.time.toLocaleTimeString("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            });
             const date = row.time.toISOString().substring(0, 10);
 
             if (index === -1) {
@@ -400,7 +412,7 @@ const getAdminByDayStatistics = async (req, res) => {
                     statisticsByDay[index].first_time = time;
                 }
             }
-        });        
+        });
 
         res.status(200).json({
             data: statisticsByDay,
@@ -414,45 +426,46 @@ const getAdminByDayStatistics = async (req, res) => {
     }
 };
 
-const getUserLabels = async(req, res) => {
-    try {
-        const users = await _getUserLabels();
-        const labels = users.map((user) => {
-            return {
-                fullName: `${user.lname} ${user.fname}`,
-                value: user.user_id,
-            };
-        });
-        res.json(labels);
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 const getAdminByUserStatistics = async (req, res) => {
     try {
-        console.log("BY USER controller")
+        //create date borders
+        const month_year = req.query.monthYear;
+        const endOfTheMonth = new Date(
+            month_year.substring(0, 11) + "23:59:59.000Z"
+        );
+
+        const currDate = new Date(month_year);
+        let firstDay = new Date(currDate.getFullYear(), currDate.getMonth(), 2);
+        let lastDay = new Date(
+            endOfTheMonth.getFullYear(),
+            endOfTheMonth.getMonth() + 1,
+            0
+        );
+        const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
+        const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
         //get data
-        const user_id = req.query.userId
-        const month_year = req.query.monthYear
+        const user_id = req.query.userId;
         const data = await _getAdminByUserStatistics({
             user_id,
-            month_year,
+            start,
+            end,
         });
-        
+
         // clean and structure the data
         let statisticsByUser = [];
         let rowIndex = 1;
         data.forEach((row) => {
             let newRow = {};
-            
-            const time = row.time.toLocaleTimeString('en-Gb',
-            { hour12: false, timeZone: 'UTC' });
+
+            const time = row.time.toLocaleTimeString("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            });
             const date = row.time.toISOString().substring(0, 10);
-            
+
             const index = statisticsByUser.findIndex(
                 (item) => date === item.date
-                );
+            );
 
             if (index === -1) {
                 newRow.index = rowIndex;
@@ -471,8 +484,8 @@ const getAdminByUserStatistics = async (req, res) => {
                     statisticsByUser[index].first_time = time;
                 }
             }
-        });        
-        
+        });
+
         res.status(200).json({
             data: statisticsByUser,
             total: statisticsByUser.length,
@@ -485,7 +498,142 @@ const getAdminByUserStatistics = async (req, res) => {
     }
 };
 
+const getStatisticsByDay = async (req, res) => {
+    try {
+        const user_id = req.user.userId;
+        console.log("USER_ID in controller: ", user_id);
+        //get data
+        let { date } = req.query;
+        console.log("date in cotroller before model: ", date);
+        const data = await _getStatisticsByDay({
+            user_id,
+            date,
+        });
+        console.log("data in controller: ", data);
+        // get amount of rows
+        const totalObj = await _getStatisticsTotalByDay({ date, user_id });
 
+        // clean and structure the data
+        let statisticsByDay = [];
+        let rowIndex = 1;
+        data.forEach((row) => {
+            const index = statisticsByDay.findIndex(
+                (item) => row.user_id === item.user_id
+            );
+            let newRow = {};
+
+            const time = row.time.toLocaleTimeString("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            });
+            const date = row.time.toISOString().substring(0, 10);
+
+            if (index === -1) {
+                newRow.index = rowIndex;
+                newRow.first_time = time;
+                newRow.last_time = time;
+                newRow.date = date;
+                newRow.name = `${row.fname} ${row.lname}`;
+                newRow.user_id = row.user_id;
+                statisticsByDay.push(newRow);
+                rowIndex++;
+            } else {
+                if (statisticsByDay[index].last_time < time) {
+                    statisticsByDay[index].last_time = time;
+                }
+                if (statisticsByDay[index].first_time > time) {
+                    statisticsByDay[index].first_time = time;
+                }
+            }
+        });
+
+        res.status(200).json({
+            data: statisticsByDay,
+            total: Number(totalObj[0].count),
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get statistcs by day",
+        });
+    }
+};
+
+const getStatisticsByUser = async (req, res) => {
+    try {
+        const user_id = req.user.userId;
+        console.log("USER_ID in controller: ", user_id);
+        console.log("111");
+        //create date borders
+        const month_year = req.query.monthYear;
+        console.log("MONTH YEAR IN USER CONTR: ", month_year)
+        const endOfTheMonth = new Date(
+            month_year.substring(0, 11) + "23:59:59.000Z"
+        );
+
+        const currDate = new Date(month_year);
+        let firstDay = new Date(currDate.getFullYear(), currDate.getMonth(), 2);
+        let lastDay = new Date(
+            endOfTheMonth.getFullYear(),
+            endOfTheMonth.getMonth() + 1,
+            0
+        );
+        const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
+        const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
+        //get data
+        console.log("MONTH YEAR IN CONTROLLER: ", month_year);
+        const data = await _getStatisticsByUser({
+            user_id,
+            start,
+            end,
+        });
+
+        // clean and structure the data
+        let statisticsByUser = [];
+        let rowIndex = 1;
+        data.forEach((row) => {
+            let newRow = {};
+
+            const time = row.time.toLocaleTimeString("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            });
+            const date = row.time.toISOString().substring(0, 10);
+
+            const index = statisticsByUser.findIndex(
+                (item) => date === item.date
+            );
+
+            if (index === -1) {
+                newRow.index = rowIndex;
+                newRow.first_time = time;
+                newRow.last_time = time;
+                newRow.date = date;
+                newRow.name = `${row.fname} ${row.lname}`;
+                newRow.user_id = row.user_id;
+                statisticsByUser.push(newRow);
+                rowIndex++;
+            } else {
+                if (statisticsByUser[index].last_time < time) {
+                    statisticsByUser[index].last_time = time;
+                }
+                if (statisticsByUser[index].first_time > time) {
+                    statisticsByUser[index].first_time = time;
+                }
+            }
+        });
+
+        res.status(200).json({
+            data: statisticsByUser,
+            total: statisticsByUser.length,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get statistcs by day",
+        });
+    }
+};
 
 module.exports = {
     register,
@@ -505,5 +653,7 @@ module.exports = {
     ChangePassword,
     getAdminByDayStatistics,
     getUserLabels,
-    getAdminByUserStatistics
+    getAdminByUserStatistics,
+    getStatisticsByDay,
+    getStatisticsByUser,
 };
