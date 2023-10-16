@@ -4,9 +4,7 @@ import "./VideoCapture.css";
 import { unDoStringify } from "../utils/parseDescriptions";
 import axios from "axios";
 import AlertMsg from "./Alert.js";
-import { useTheme } from "@mui/material";
-import { themeSettings } from "../theme";
-import { tokens } from "../theme";
+import dateTime from "../utils/dateTime";
 
 const VideoCapture = () => {
     const intervalId = useRef();
@@ -16,7 +14,7 @@ const VideoCapture = () => {
     const [lastRecognized, setLastRecognized] = useState("");
     let streamVideo = "";
     let tracks = "";
-    let descriptorsIntervalID = 0
+    let descriptorsIntervalID = 0;
 
     // LOAD FROM USEEFFECT
 
@@ -25,7 +23,7 @@ const VideoCapture = () => {
         return () => {
             clearInterval(intervalId.current);
             clearInterval(sendIntervalId.current);
-            clearInterval(descriptorsIntervalID)
+            clearInterval(descriptorsIntervalID);
             tracks && stopVideo();
         };
     }, []);
@@ -107,23 +105,25 @@ const VideoCapture = () => {
         try {
             let labeledFaceDescriptors = [];
             let userNames = [];
-            let faceMatcher = []
+            let faceMatcher = [];
             // get descriptors at the beginning
             labeledFaceDescriptors = await getLabeledFaceDescriptions();
             userNames = await getAllUserNames();
             faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-            console.log("new usernames and faceMatchers generated first time")
-            // get descriptors in loop 
+            console.log("new usernames and faceMatchers generated first time");
+            // get descriptors in loop
             descriptorsIntervalID = setInterval(async () => {
                 try {
-                labeledFaceDescriptors = await getLabeledFaceDescriptions();
-                userNames = await getAllUserNames();
-                faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-                console.log("new usernames and faceMatchers generated")
+                    labeledFaceDescriptors = await getLabeledFaceDescriptions();
+                    userNames = await getAllUserNames();
+                    faceMatcher = new faceapi.FaceMatcher(
+                        labeledFaceDescriptors
+                    );
+                    console.log("new usernames and faceMatchers generated");
                 } catch (error) {
-                    console.log(error)
+                    console.log(error);
                 }
-            }, 1000 * 60* 5);
+            }, 1000 * 60 * 5);
 
             let displaySize = { width: "0", height: "0" };
             displaySize = {
@@ -191,13 +191,16 @@ const VideoCapture = () => {
                             );
                             //create if there isn`t
                             if (buffInd === -1) {
+                                const date = dateTime(new Date());
                                 const newObj = {
                                     label: result._label,
-                                    time: new Date().toISOString(),
-                                    recInRow: 1, 
+                                    time: date,
+                                    recInRow: 1,
                                     notRecInRow: 0,
                                 };
                                 buffer.push(newObj);
+                                console.log("******************");
+                                console.log("newObj: ", newObj);
                             } else {
                                 //update if there is
                                 buffer[buffInd].recInRow++;

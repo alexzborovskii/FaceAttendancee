@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -11,31 +11,94 @@ import { useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AdminByDayStatistics = () => {
-    const [paginationModel, setPaginationModel] = useState({
-        pageSize: 10,
-        page: 0,
-    });
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
+import dateTime from "../utils/dateTime.js"
+
+const AdminByDayStatistics = () => {
+    
+    
     const [pageState, setPageState] = useState({
         isLoading: false,
         data: [],
         total: 0,
     });
-
-    const [date, setDate] = useState(new Date().toISOString());
-
+    
+    const [date, setDate] = useState(dateTime(new Date()));
+    const [user, setUser] = useState("");
+    const [monthYear, setMonthYear] = useState(new Date().toISOString());
+    const [userLabels, setUserLabels] = useState([]);
+    const [identifier, setIdentifier] = useState("user_id");
+    const [pageSizeArrayState, setPageSizeArrayState] = useState([])
+    let source = "date";
     useEffect(() => {
-        getAdminByDayStatistics(date);
-    }, [paginationModel.page, paginationModel.pageSize, date]);
+        getUserLabels();
+    }, []);
+    
+    useEffect(() => {
+        source = "date";
+    }, [date]);
+    
+    useEffect(() => {
+        if (user && monthYear) source = "user";
+    }, [monthYear, user]);
+    
+    useEffect(() => {
+        if (source === "date") {
+            setPageSizeArrayState([]);
+            getAdminByDayStatistics();
+        } else if (source === "user") {
+            setPageSizeArrayState([]);
+            getAdminByUserStatistics();
+        }
+    }, [
+        date,
+        user,
+        monthYear,
+    ]);
+
+    const getUserLabels = async () => {
+        try {
+            const res = await axios(`/api/users/userLabels`);
+            setUserLabels(res.data);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const getAdminByUserStatistics = async (event) => {
+        try {
+            setIdentifier("index");
+            setPageState((old) => ({ ...old, isLoading: true }));
+            const res = await axios(
+                `/api/users/AdminByUserStatistics?userId=${user}&monthYear=${monthYear}`
+            );
+            const data = res.data.data;
+            const total = res.data.total;
+            setPageState((old) => ({
+                ...old,
+                isLoading: false,
+                data,
+                total,
+            }));
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
     const getAdminByDayStatistics = async () => {
         try {
+            setIdentifier("user_id");
             setPageState((old) => ({ ...old, isLoading: true }));
+            console.log("date: ", date)
             const res = await axios(
-                `/api/users/AdminByDayStatistics?page=${paginationModel.page}&limit=${paginationModel.pageSize}&date=${date}`
+                `/api/users/AdminByDayStatistics?date=${date}`
             );
             const data = res.data.data;
+            console.log("day data: ", data);
             const total = res.data.total;
             setPageState((old) => ({
                 ...old,
@@ -52,6 +115,7 @@ const AdminByDayStatistics = () => {
     const colors = tokens(theme.palette.mode);
 
     const columns = [
+        { field: "index", headerName: "#", flex: 0.5 },
         { field: "user_id", headerName: "User ID", flex: 0.5 },
         {
             field: "name",
@@ -82,22 +146,75 @@ const AdminByDayStatistics = () => {
     return (
         <Box m="10px">
             <Header title="Admin by Day statistics" />
-            <LocalizationProvider
-                dateAdapter={AdapterDayjs}
-                // localeText={locale}
-            >
-                <DatePicker
-                    defaultValue={dayjs(date)}
-                    autoOk={true}
-                    hintText="Select Date"
-                    value={dayjs(date)}
-                    onChange={(e) => {
-                        setDate(e.$d.toISOString());
-                    }}
-                />
-            </LocalizationProvider>
             <Box
-                // m="0 0 0 0"
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                        sx={{ m: 1 }}
+                        label="Date"
+                        defaultValue={dayjs(date)}
+                        autoOk={true}
+                        hintText="Select Date"
+                        format="YYYY-MM-DD"
+                        value={dayjs(date)}
+                        onChange={(e) => {
+                            setDate(dateTime(e.$d));
+                        }}
+                    />
+                </LocalizationProvider>
+                <Typography sx={{ display: "inline-block" }}>OR</Typography>
+                <Box>
+                    <FormControl
+                        sx={{
+                            m: 1,
+                            minWidth: 120,
+                        }}>
+                        <InputLabel id="select-helper-label">User</InputLabel>
+                        <Select
+                            labelId="select-label"
+                            id="userselect-helper"
+                            value={user}
+                            label="User"
+                            onChange={(e) => setUser(e.target.value)}>
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            {userLabels &&
+                                userLabels.map((label, index) => {
+                                    return (
+                                        <MenuItem
+                                            value={label.value}
+                                            key={index}>
+                                            {label.fullName}
+                                        </MenuItem>
+                                    );
+                                })}
+                        </Select>
+                    </FormControl>
+                    <LocalizationProvider
+                        dateAdapter={AdapterDayjs}
+                        components={["DatePicker"]}>
+                        <DatePicker
+                            sx={{ m: 1 }}
+                            label={'Month and year"'}
+                            views={["month", "year"]}
+                            defaultValue={dayjs(date)}
+                            autoOk={true}
+                            hintText="Select Month"
+                            value={dayjs(date)}
+                            onChange={(e) => {
+                                setMonthYear(e.$d.toISOString());
+                            }}
+                        />
+                    </LocalizationProvider>
+                </Box>
+            </Box>
+
+            <Box
                 height="84vh"
                 sx={{
                     "& .MuiDataGrid-root": {
@@ -127,39 +244,19 @@ const AdminByDayStatistics = () => {
                         color: `${colors.grey[100]} !important`,
                     },
                 }}>
-                {console.log("date line 127: ", date)}
                 <DataGrid
                     density="compact"
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    getRowId={(row) => row.user_id}
+                    getRowId={(row) => row[`${identifier}`]}
                     autoHeight
                     rows={pageState.data}
                     rowCount={pageState.total}
                     loading={pageState.isLoading}
-                    paginationMode="server"
-                    initialState={{
-                        page: paginationModel.page,
-                        pagination: {
-                            paginationModel: {
-                                pageSize: paginationModel.pageSize,
-                            },
-                        },
-                    }}
-                    pageSizeOptions={[
-                        10,
-                        30,
-                        50,
-                        70,
-                        100,
-                        { label: "All", value: pageState.total },
-                    ]}
+                    pageSizeOptions={[]}
                     pagination
-                    page={paginationModel.page}
-                    pageSize={paginationModel.pageSize}
-                    paginationModel={paginationModel}
-                    onPaginationModelChange={setPaginationModel}
+
                     columns={columns}
                 />
             </Box>

@@ -14,7 +14,9 @@ const {
     getAdminStatistics,
     getUserNames,
     ChangePassword,
-    getAdminByDayStatistics
+    getAdminByDayStatistics,
+    getUserLabels,
+    getAdminByUserStatistics
 } = require("../controllers/users.controllers.js");
 const express = require("express");
 const u_router = express.Router();
@@ -41,6 +43,8 @@ u_router.get("/getAdminStatistics/", verifyToken, getAdminStatistics);
 u_router.get("/usernames/", verifyToken, getUserNames) 
 u_router.put("/changePassword/", verifyToken, ChangePassword)
 u_router.get("/AdminByDayStatistics/", verifyToken, getAdminByDayStatistics) 
+u_router.get("/userLabels/", verifyToken, getUserLabels) 
+u_router.get("/AdminByUserStatistics/", verifyToken, getAdminByUserStatistics) 
 
 
 module.exports = {

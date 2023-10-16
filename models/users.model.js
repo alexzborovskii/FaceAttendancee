@@ -110,42 +110,60 @@ const _getAllUserNames = () => {
     return db("users").select("user_id", "fname");
 };
 
-const _getAdminByDayStatistics = ({ perPage, currentPage, date }) => {
+const _getAdminByDayStatistics = ({ date }) => {
+    console.log("date in models: ", date)
     const startOfTheDay = new Date(date.substring(0, 11) + "00:00:00.000Z");
     const endOfTheDay = new Date(date.substring(0, 11) + "23:59:59.999Z");
-    const currDate = new Date(date)
-    console.log(
-        "startOfTheDay: ",
-        startOfTheDay,
-        " \n endOfTheDay: ",
-        endOfTheDay,
-        " \n date: ",
-        currDate
-    );
-    console.log(startOfTheDay < currDate);
-    console.log(endOfTheDay > currDate);
 
     return db("detections as d")
         .join("users as u", "u.user_id", "d.user_id")
         .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
         .orderBy("d.detection_id", "desc")
-        .where("d.time", '>=', startOfTheDay)
-        .where("d.time", '<=', endOfTheDay)
-        .paginate({
-            perPage,
-            currentPage,
-        });
+        .where("d.time", ">=", startOfTheDay)
+        .where("d.time", "<=", endOfTheDay)
 };
 
 const _getAdminByDayStatisticsTotal = ({ date }) => {
-    console.log("substring:" , date.substring(0, 11))
     const startOfTheDay = new Date(date.substring(0, 11) + "00:00:00.000Z");
     const endOfTheDay = new Date(date.substring(0, 11) + "23:59:59.999Z");
 
     return db("detections as d")
-        .where("d.time", '>=', startOfTheDay)
-        .where("d.time", '<=', endOfTheDay)
+        .where("d.time", ">=", startOfTheDay)
+        .where("d.time", "<=", endOfTheDay)
         .countDistinct("user_id");
+};
+
+const _getUserLabels = () => {
+    return db("users").select("user_id", "fname", "lname");
+};
+
+const _getAdminByUserStatistics = ({ user_id, month_year }) => {
+    const endOfTheMonth = new Date(
+        month_year.substring(0, 11) + "23:59:59.000Z"
+    );
+     
+    const currDate = new Date(month_year);
+
+    let firstDay = new Date(currDate.getFullYear(), currDate.getMonth(), 2);
+    let lastDay = new Date(
+        endOfTheMonth.getFullYear(),
+        endOfTheMonth.getMonth() + 1,
+        0
+        );
+        
+    // console.log("first day: ", firstDay);
+    // console.log("last day: ", lastDay)
+    const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
+    const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
+    // console.log("start: ", start)
+    // console.log("end: ", end)
+    return db("detections as d")
+        .join("users as u", "u.user_id", "d.user_id")
+        .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
+        .orderBy("d.detection_id", "desc")
+        .where({ "u.user_id": user_id })
+        .where("d.time", ">=", `${start}`)
+        .where("d.time", "<=", `${end}`);
 };
 
 module.exports = {
@@ -169,4 +187,6 @@ module.exports = {
     _putPass,
     _getAdminByDayStatistics,
     _getAdminByDayStatisticsTotal,
+    _getUserLabels,
+    _getAdminByUserStatistics,
 };

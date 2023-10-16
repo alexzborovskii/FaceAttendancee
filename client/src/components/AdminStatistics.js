@@ -120,7 +120,7 @@ const AdminStatistics = () => {
                             },
                         },
                     }}
-                    pageSizeOptions={[10, 30, 50, 70, 100, {label:"All", value: pageState.total}]}
+                    pageSizeOptions={[10, 30, 50, 70, 100,]}
                     pagination
                     page={paginationModel.page}
                     pageSize={paginationModel.pageSize}

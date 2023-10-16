@@ -71,7 +71,6 @@ const Statistics = () => {
         <Box m="10px">
             <Header title="My statistics" />
             <Box
-                // m="0 0 0 0"
                 height="84vh"
                 sx={{
                     "& .MuiDataGrid-root": {
@@ -120,7 +119,7 @@ const Statistics = () => {
                             },
                         },
                     }}
-                    pageSizeOptions={[10, 30, 50, 70, 100, {label:"All", value: pageState.total}]}
+                    pageSizeOptions={[10, 30, 50, 70, 100,]}
                     pagination
                     page={paginationModel.page}
                     pageSize={paginationModel.pageSize}

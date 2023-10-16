@@ -99,25 +99,32 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Data
+              Statistics
             </Typography>
             <Item
-              title="Admin Statiscics"
+              title="Admin row"
               to="/adminStatistics"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Admin by day statiscics"
+              title="Admin by day"
               to="/AdminByDayStatistics"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Statisctics"
+              title="Row"
               to="/statistics"
+              icon={<ContactsOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Row by day"
+              to="/statisticsByDay"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
