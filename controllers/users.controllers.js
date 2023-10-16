@@ -562,11 +562,8 @@ const getStatisticsByDay = async (req, res) => {
 const getStatisticsByUser = async (req, res) => {
     try {
         const user_id = req.user.userId;
-        console.log("USER_ID in controller: ", user_id);
-        console.log("111");
         //create date borders
         const month_year = req.query.monthYear;
-        console.log("MONTH YEAR IN USER CONTR: ", month_year)
         const endOfTheMonth = new Date(
             month_year.substring(0, 11) + "23:59:59.000Z"
         );
@@ -581,7 +578,6 @@ const getStatisticsByUser = async (req, res) => {
         const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
         const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
         //get data
-        console.log("MONTH YEAR IN CONTROLLER: ", month_year);
         const data = await _getStatisticsByUser({
             user_id,
             start,

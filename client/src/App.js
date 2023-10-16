@@ -16,12 +16,15 @@ import LayoutFilter from "./auth/LayoutFilter.js";
 import ChangePassword from "./components/ChangePassword.js";
 import AdminByDayStatistics from "./components/AdminByDayStatistics.js";
 import StatisticsByDay from "./components/StatisticsByDay.js";
+import LineChart from "./components/LineChart.js";
 export const AppContext = createContext(null);
 
 function App() {
     const [token, setToken] = useState();
     const [theme, colorMode] = useMode();
     const [isSidebar, setIsSidebar] = useState(true);
+    const [selected, setSelected] = useState("Dashboard");
+
     //errorBoubnadry
     const [hasError, setHasError] = useState(false);
     const location = useLocation();
@@ -32,12 +35,12 @@ function App() {
 
     return (
         <ColorModeContext.Provider value={colorMode}>
-            <AppContext.Provider value={{ token, setToken }}>
+            <AppContext.Provider value={{ token, setToken, }}>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
                         <div className="app">
                             <LayoutFilter>
-                                <Sidebar isSidebar={isSidebar} />
+                                <Sidebar selected={selected} setSelected={setSelected} isSidebar={isSidebar} />
                             </LayoutFilter>
 
                     <ErrorBoundary
@@ -45,7 +48,7 @@ function App() {
                         setHasError={setHasError}>
                             <main className="content">
                                 <LayoutFilter>
-                                    <Topbar setIsSidebar={setIsSidebar} />
+                                    <Topbar selected={selected} setIsSidebar={setIsSidebar} />
                                 </LayoutFilter>
 
                                 <Routes>
@@ -86,6 +89,14 @@ function App() {
                                         element={
                                             <Auth>
                                                 <AdminByDayStatistics />{" "}
+                                            </Auth>
+                                        }
+                                    />
+                                    <Route
+                                        path="/lineChart"
+                                        element={
+                                            <Auth>
+                                                <LineChart />{" "}
                                             </Auth>
                                         }
                                     />

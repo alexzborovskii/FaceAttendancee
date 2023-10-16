@@ -79,10 +79,8 @@ const StatisticsByDay = () => {
         try {
             setIdentifier("user_id");
             setPageState((old) => ({ ...old, isLoading: true }));
-            console.log("date: ", date);
             const res = await axios(`/api/users/StatisticsByDay?date=${date}`);
             const data = res.data.data;
-            console.log("day data: ", data);
             const total = res.data.total;
             setPageState((old) => ({
                 ...old,
@@ -129,7 +127,6 @@ const StatisticsByDay = () => {
 
     return (
         <Box m="10px">
-            <Header title="Admin by Day statistics" />
             <Box
                 sx={{
                     display: "flex",

@@ -69,7 +69,6 @@ const AdminStatistics = () => {
 
     return (
         <Box m="10px">
-            <Header title="Users statistics" />
             <Box
                 // m="0 0 0 0"
                 height="84vh"

@@ -69,7 +69,6 @@ const Statistics = () => {
 
     return (
         <Box m="10px">
-            <Header title="My statistics" />
             <Box
                 height="84vh"
                 sx={{
