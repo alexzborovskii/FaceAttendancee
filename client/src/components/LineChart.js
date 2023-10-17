@@ -12,29 +12,67 @@ import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import dateTime from "../utils/dateTime.js"
+import dateTime from "../utils/dateTime.js";
 
+const valueFormatter = (date) =>
+    date.getHours() === 0
+        ? date.toLocaleDateString("en-Gb", {
+              month: "2-digit",
+              day: "2-digit",
+              timeZone: "UTC",
+          })
+        : date.toLocaleTimeString("en-Gb", {
+              hour: "2-digit",
+              timeZone: "UTC",
+          });
 
-const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-// const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
-const amtData = [2400, 2210, 2290, 2000, 2181, 2500, 2100];
-const xLabels = [
-    "Page A",
-    "Page B",
-    "Page C",
-    "Page D",
-    "Page E",
-    "Page F",
-    "Page G",
-];
+// const uData = [
+//     new Date(new Date("2023-10-04T13:47:15.451Z").toUTCString().slice(0, -4)),
+//     new Date(new Date("2023-10-05T18:07:40.599Z").toUTCString().slice(0, -4)),
+// ];
+
+// const amtData = [
+//     new Date(new Date("2023-10-04T13:35:38.477Z").toUTCString().slice(0, -4)),
+//     new Date(new Date("2023-10-05T10:06:40.599Z").toUTCString().slice(0, -4)),
+// ];
 
 export default function StackedAreaChart() {
     const [date, setDate] = useState(dateTime(new Date()));
     const [monthYear, setMonthYear] = useState(dateTime(new Date()));
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const [chartData, setChartData] = useState();
+    
+  useEffect(()=> {
+    getLineData()
+  }, [])
 
+    useEffect(() => {
+        getLineData();
+    }, [monthYear]);
+    //
+    const getLineData = async () => {
+        try {
+            const res = await axios(
+                `/api/users/LineData?monthYear=${monthYear}`
+            );
+            const data = res.data.data;
+            const total = res.data.total;
+            console.log("Data: ", data);
+            console.log("Total: ", total);
+            const firstTime = data.firstTime.map((item) => new Date(item))
+            const lastTime = data.lastTime.map((item) => new Date(item))
+            const dates = data.dates.map((item) => new Date(item))
+            setChartData({firstTime, lastTime, dates});
+        } catch (e) {
+            console.log(e);
+        }
+    };
+    
+    // getLineData()
     return (
         <Box m="20px">
-            <Box height="80vh">
+            <Box height="75vh">
                 <LocalizationProvider
                     dateAdapter={AdapterDayjs}
                     components={["DatePicker"]}>
@@ -50,37 +88,40 @@ export default function StackedAreaChart() {
                             setMonthYear(e.$d.toISOString());
                         }}
                     />
+                {console.log("cD: ", chartData)}
                 </LocalizationProvider>
-                <LineChart
+                {chartData && <LineChart
                     series={[
                         {
-                            data: uData,
-                            label: "uv",
-                            stack: "total",
-                            showMark: false,
+                            data: chartData.firstTime,
+                            label: "ft",
+                            // stack: "total",
+                            showMark: true,
                         },
-                        // {
-                        //     data: pData,
-                        //     label: "pv",
-                        //     area: true,
-                        //     stack: "total",
-                        //     showMark: false,
-                        // },
+
                         {
-                            data: amtData,
-                            label: "amt",
-                            area: true,
-                            stack: "total",
-                            showMark: false,
+                            data: chartData.lastTime,
+                            label: "lt",
+                            // area: true,
+                            // stack: "total",
+                            showMark: true,
                         },
                     ]}
-                    xAxis={[{ scaleType: "point", data: xLabels }]}
+                    
+                    xAxis={[
+                        {
+                          data: chartData.dates,
+                          scaleType: "time",
+                          valueFormatter,
+                          tickMinStep: 3600 * 1000 * 24,
+                        }]}
                     sx={{
                         ".MuiLineElement-root": {
                             display: "none",
                         },
                     }}
-                />
+                    leftAxis={null}
+                />}
             </Box>
         </Box>
     );

@@ -34,8 +34,6 @@ const Sidebar = (props) => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const {selected, setSelected} = props;
-  console.log("props: ", props)
-  console.log("SELECTED: ", selected)
   return (
     <Box
       sx={{

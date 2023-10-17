@@ -19,6 +19,7 @@ const {
     getAdminByUserStatistics,
     getStatisticsByDay,
     getStatisticsByUser,
+    getLineData,
 } = require("../controllers/users.controllers.js");
 const express = require("express");
 const u_router = express.Router();
@@ -49,6 +50,7 @@ u_router.get("/AdminByDayStatistics/", verifyToken, getAdminByDayStatistics)
 u_router.get("/AdminByUserStatistics/", verifyToken, getAdminByUserStatistics) 
 u_router.get("/StatisticsByDay/", verifyToken, getStatisticsByDay) 
 u_router.get("/StatisticsByUser/", verifyToken, getStatisticsByUser) 
+u_router.get("/LineData/", verifyToken, getLineData) 
 
 
 module.exports = {

@@ -127,7 +127,7 @@ const StatisticsByDay = () => {
 
     return (
         <Box m="10px">
-            <Box
+                <Box
                 sx={{
                     display: "flex",
                     alignItems: "center",
@@ -135,7 +135,7 @@ const StatisticsByDay = () => {
                 }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
-                        sx={{ m: 1 }}
+                        sx={{ m: 1 }} 
                         label="Date"
                         defaultValue={dayjs(date)}
                         autoOk={true}
