@@ -17,6 +17,7 @@ import ChangePassword from "./components/ChangePassword.js";
 import AdminByDayStatistics from "./components/AdminByDayStatistics.js";
 import StatisticsByDay from "./components/StatisticsByDay.js";
 import LineChart from "./components/LineChart.js";
+import TimeSpentChart from "./components/TimeSpentChart.js";
 export const AppContext = createContext(null);
 
 function App() {
@@ -97,6 +98,14 @@ function App() {
                                         element={
                                             <Auth>
                                                 <LineChart />{" "}
+                                            </Auth>
+                                        }
+                                    />
+                                    <Route
+                                        path="/barChart"
+                                        element={
+                                            <Auth>
+                                                <TimeSpentChart />{" "}
                                             </Auth>
                                         }
                                     />

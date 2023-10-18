@@ -654,7 +654,6 @@ const getLineData = async (req, res) => {
             start,
             end,
         });
-        // console.log("data row: ", data)
         // clean and structure the data
         let statisticsByUser = [];
         let rowIndex = 1;
@@ -690,18 +689,84 @@ const getLineData = async (req, res) => {
             }
         });
 
-        // console.log("statisticsByUser: ", statisticsByUser)
-        // console.log("statisticsByUser.length: ", statisticsByUser.length    )
-
-        // const firstTime = statisticsByUser.map((date) => new Date().toUTCString().slice(0, -12) + date.first_time)
-        // const lastTime = statisticsByUser.map((date) => new Date().toUTCString().slice(0, -12) + date.last_time)
         const firstTime = statisticsByUser.map((date) => new Date().toUTCString().slice(0, -12) + date.first_time)
         const lastTime = statisticsByUser.map((date) => new Date().toUTCString().slice(0, -12) + date.last_time)
         const dates = statisticsByUser.map((date) => date.date)
-        console.log("firstTime: ", firstTime)
 
         res.status(200).json({
             data: {firstTime, lastTime, dates},
+            total: statisticsByUser.length,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get statistcs by day",
+        });
+    }
+}
+const getTimeSpentData = async (req, res) => {
+    try {
+        const user_id = req.user.userId;
+        //create date borders
+        const month_year = req.query.monthYear;
+        const endOfTheMonth = new Date(
+            month_year.substring(0, 11) + "23:59:59.000Z"
+        );
+
+        const currDate = new Date(month_year);
+        let firstDay = new Date(currDate.getFullYear(), currDate.getMonth(), 2);
+        let lastDay = new Date(
+            endOfTheMonth.getFullYear(),
+            endOfTheMonth.getMonth() + 1,
+            0
+        );
+        const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
+        const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
+        //get data
+        const data = await _getStatisticsByUser({
+            user_id,
+            start,
+            end,
+        });
+        // clean and structure the data
+        let statisticsByUser = [];
+        let rowIndex = 1;
+        data.forEach((row) => {
+            let newRow = {};
+
+            const time = row.time.toLocaleTimeString("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            });
+            const date = row.time.toISOString().substring(0, 10);
+
+            const index = statisticsByUser.findIndex(
+                (item) => date === item.date
+            );
+
+            if (index === -1) {
+                newRow.index = rowIndex;
+                newRow.first_time = row.time;
+                newRow.last_time = row.time;
+                newRow.date = date;
+                newRow.name = `${row.fname} ${row.lname}`;
+                newRow.user_id = row.user_id;
+                statisticsByUser.push(newRow);
+                rowIndex++;
+            } else {
+                if (statisticsByUser[index].last_time < row.time) {
+                    statisticsByUser[index].last_time = row.time;
+                }
+                if (statisticsByUser[index].first_time > row.time) {
+                    statisticsByUser[index].first_time = row.time;
+                }
+            }
+        });
+        const timeValue = statisticsByUser.map((date) => Math.floor((new Date(date.last_time).getTime() - new Date(date.first_time).getTime())/ (1000*60)))
+        const dates = statisticsByUser.map((date) => date.date.substring(8, 11))
+
+        res.status(200).json({
+            data: {timeValue, dates},
             total: statisticsByUser.length,
         });
     } catch (error) {
@@ -733,5 +798,7 @@ module.exports = {
     getAdminByUserStatistics,
     getStatisticsByDay,
     getStatisticsByUser,
-    getLineData
+    getLineData,
+    getTimeSpentData,
+    
 };

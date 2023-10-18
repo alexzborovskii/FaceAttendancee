@@ -135,8 +135,15 @@ const Sidebar = (props) => {
               Charts
             </Typography>
             <Item
-              title="Line"
+              title="In & Out"
               to="/lineChart"
+              icon={<ReceiptOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Time spent"
+              to="/barChart"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
