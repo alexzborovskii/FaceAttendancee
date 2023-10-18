@@ -16,7 +16,7 @@ import LayoutFilter from "./auth/LayoutFilter.js";
 import ChangePassword from "./components/ChangePassword.js";
 import AdminByDayStatistics from "./components/AdminByDayStatistics.js";
 import StatisticsByDay from "./components/StatisticsByDay.js";
-import LineChart from "./components/LineChart.js";
+import InOutChart from "./components/InOutChart.js";
 import TimeSpentChart from "./components/TimeSpentChart.js";
 export const AppContext = createContext(null);
 
@@ -97,7 +97,7 @@ function App() {
                                         path="/lineChart"
                                         element={
                                             <Auth>
-                                                <LineChart />{" "}
+                                                <InOutChart />{" "}
                                             </Auth>
                                         }
                                     />

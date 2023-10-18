@@ -180,6 +180,15 @@ const _getStatisticsByUser = ({ user_id, start, end }) => {
         .where("d.time", ">=", `${start}`)
         .where("d.time", "<=", `${end}`);
 };
+const _getStatisticsByUserAsc = ({ user_id, start, end }) => {
+    return db("detections as d")
+        .join("users as u", "u.user_id", "d.user_id")
+        .select("d.detection_id", "u.user_id", "u.fname", "u.lname", "d.time")
+        .orderBy("d.detection_id", "asc")
+        .where({ "u.user_id": user_id })
+        .where("d.time", ">=", `${start}`)
+        .where("d.time", "<=", `${end}`);
+};
 
 module.exports = {
     _register,
@@ -207,4 +216,5 @@ module.exports = {
     _getStatisticsByDay,
     _getStatisticsTotalByDay,
     _getStatisticsByUser,
+    _getStatisticsByUserAsc,
 };

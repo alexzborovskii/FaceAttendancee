@@ -23,6 +23,7 @@ const {
     _getStatisticsByDay,
     _getStatisticsTotalByDay,
     _getStatisticsByUser,
+    _getStatisticsByUserAsc
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -34,6 +35,7 @@ const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 //threading
 const { fork } = require("child_process");
+const { log } = require("console");
 
 require("dotenv").config();
 
@@ -371,11 +373,9 @@ const getAdminByDayStatistics = async (req, res) => {
     try {
         //get data
         let { date } = req.query;
-        console.log("date in cotroller before model: ", date);
         const data = await _getAdminByDayStatistics({
             date,
         });
-        console.log("data in controller: ", data);
         // get amount of rows
         const totalObj = await _getAdminByDayStatisticsTotal({ date });
 
@@ -500,15 +500,12 @@ const getAdminByUserStatistics = async (req, res) => {
 const getStatisticsByDay = async (req, res) => {
     try {
         const user_id = req.user.userId;
-        console.log("USER_ID in controller: ", user_id);
         //get data
         let { date } = req.query;
-        console.log("date in cotroller before model: ", date);
         const data = await _getStatisticsByDay({
             user_id,
             date,
         });
-        console.log("data in controller: ", data);
         // get amount of rows
         const totalObj = await _getStatisticsTotalByDay({ date, user_id });
 
@@ -557,7 +554,7 @@ const getStatisticsByDay = async (req, res) => {
         });
     }
 };
-
+ 
 const getStatisticsByUser = async (req, res) => {
     try {
         const user_id = req.user.userId;
@@ -649,7 +646,7 @@ const getLineData = async (req, res) => {
         const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
         const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
         //get data
-        const data = await _getStatisticsByUser({
+        const data = await _getStatisticsByUserAsc({
             user_id,
             start,
             end,
@@ -689,12 +686,15 @@ const getLineData = async (req, res) => {
             }
         });
 
-        const firstTime = statisticsByUser.map((date) => new Date().toUTCString().slice(0, -12) + date.first_time)
-        const lastTime = statisticsByUser.map((date) => new Date().toUTCString().slice(0, -12) + date.last_time)
-        const dates = statisticsByUser.map((date) => date.date)
+        const firstTime = statisticsByUser.map((date) => new Date("Wed, 18 Oct 2023 " + date.first_time+"Z").getTime());
+        const lastTime = statisticsByUser.map((date) => new Date("Wed, 18 Oct 2023 " + date.last_time+"Z").getTime());
+        const officialStart = Array(firstTime.length).fill(new Date("Wed, 18 Oct 2023 " + "9:00:00"+"Z").getTime())
+        const officialEnd = Array(firstTime.length).fill(new Date("Wed, 18 Oct 2023 " + "18:00:00"+"Z").getTime())
+
+        const dates = statisticsByUser.map((date) => date.date.substring(8, 11));
 
         res.status(200).json({
-            data: {firstTime, lastTime, dates},
+            data: {firstTime, lastTime, dates, officialStart, officialEnd},
             total: statisticsByUser.length,
         });
     } catch (error) {
@@ -800,5 +800,5 @@ module.exports = {
     getStatisticsByUser,
     getLineData,
     getTimeSpentData,
-    
+
 };

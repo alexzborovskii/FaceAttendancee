@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import dateTime from "../utils/dateTime.js";
 import { BarChart } from "@mui/x-charts";
+import NoDataMessage from "./NoDataMessage";
 
 export default function TimeSpentChart() {
     const [date, setDate] = useState(dateTime(new Date()));
@@ -25,7 +26,7 @@ export default function TimeSpentChart() {
     useEffect(() => {
         getCharData();
     }, [monthYear]);
-    
+
     const getCharData = async () => {
         try {
             const res = await axios(
@@ -35,14 +36,19 @@ export default function TimeSpentChart() {
             const total = res.data.total;
             const timeValue = data.timeValue;
             const dates = data.dates;
-            setChartData({ timeValue, dates });
+            if (dates.length) setChartData({ timeValue, dates });
         } catch (e) {
             console.log(e);
         }
     };
 
-    return (
-        <Box m="20px">
+    const timeToHours = (data) =>
+        Math.floor(data / 60) + ":" + (data % 60) + "h";
+
+        return (
+            
+            <Box m="20px">
+            {chartData ? (
             <Box height="75vh">
                 <LocalizationProvider
                     dateAdapter={AdapterDayjs}
@@ -60,13 +66,13 @@ export default function TimeSpentChart() {
                         }}
                     />
                 </LocalizationProvider>
-                {chartData && (
                     <BarChart
                         series={[
                             {
                                 data: chartData.timeValue,
                                 label: "time inside (min)",
                                 id: "timeId",
+                                valueFormatter: timeToHours,
                             },
                         ]}
                         xAxis={[
@@ -75,9 +81,14 @@ export default function TimeSpentChart() {
                                 scaleType: "band",
                             },
                         ]}
+                        yAxis={[
+                            {
+                                valueFormatter: timeToHours,
+                            },
+                        ]}
                     />
-                )}
             </Box>
+                ) : <NoDataMessage />}
         </Box>
     );
 }

@@ -43,12 +43,13 @@ const createLabeledFaceDescriptors = async (samplesAndUser, label) => {
     for (let i = 0; i < descriptions.length; i++) {
         typedDescriptionsJson.push(stringifyForEveryThing(descriptions[i]));
     }
+    if (typedDescriptionsJson == []) return "Empty";
 
     const labeledFaceDescriptors = {
         _label: label,
         _descriptors: typedDescriptionsJson,
     };
-
+    
     // put to DB
     const data = await _putDescriptors({
         descriptors: labeledFaceDescriptors,

@@ -110,7 +110,6 @@ const VideoCapture = () => {
             labeledFaceDescriptors = await getLabeledFaceDescriptions();
             userNames = await getAllUserNames();
             faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-            console.log("new usernames and faceMatchers generated first time");
             // get descriptors in loop
             descriptorsIntervalID = setInterval(async () => {
                 try {
@@ -119,11 +118,10 @@ const VideoCapture = () => {
                     faceMatcher = new faceapi.FaceMatcher(
                         labeledFaceDescriptors
                     );
-                    console.log("new usernames and faceMatchers generated");
                 } catch (error) {
                     console.log(error);
                 }
-            }, 1000 * 60 * 5);
+            }, 1000 * 60 * 10);
 
             let displaySize = { width: "0", height: "0" };
             displaySize = {
@@ -199,8 +197,6 @@ const VideoCapture = () => {
                                     notRecInRow: 0,
                                 };
                                 buffer.push(newObj);
-                                console.log("******************");
-                                console.log("newObj: ", newObj);
                             } else {
                                 //update if there is
                                 buffer[buffInd].recInRow++;
