@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import AlertMsg from "./Alert";
-import { Button } from "@mui/material";
+import { Alert, Button } from "@mui/material";
 import { Typography, Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
@@ -22,6 +22,7 @@ const Samples = (props) => {
     const [publicIDs, setPublicIDs] = useState([]);
     const [isValidSize, setIsValidSize] = useState(true);
     const [sampleExists, setSampleExists] = useState(true);
+    const [infoSuccessMsg, setInfoSuccessMsg] = useState("");
 
     const { userId } = useContext(AppContext);
 
@@ -64,7 +65,13 @@ const Samples = (props) => {
             if (file && file.size > maxFileSizeInKB) {
                 setErrMsg("");
                 setIsValidSize(false);
-                setErrMsg(`Image cant be bigger than 0.5 MB. Image is ${Math.round(((file.size / (1024 * 1024))+ Number.EPSILON) * 100) / 100} MB`);
+                setErrMsg(
+                    `Image cant be bigger than 0.5 MB. Image is ${
+                        Math.round(
+                            (file.size / (1024 * 1024) + Number.EPSILON) * 100
+                        ) / 100
+                    } MB`
+                );
             } else if (file && file.size <= maxFileSizeInKB) {
                 setIsValidSize(true);
                 setErrMsg("");
@@ -134,6 +141,9 @@ const Samples = (props) => {
 
     const generateDescriptors = async (userId) => {
         try {
+            setInfoSuccessMsg(
+                "Generation started. It will take a few minutes. It`s not necessary to stay at this page."
+            );
             const res = await fetch(`/api/users/putdescripters/`);
             const data = await res.json();
             console.log("DATA: ", data);
@@ -148,7 +158,7 @@ const Samples = (props) => {
         <div>
             <Header title="Upload an image" />
             <AlertMsg msg={errMsg} type="error" />
-            <AlertMsg msg={successMsg}  type="success" />
+            <AlertMsg msg={successMsg} type="success" />
             <form onSubmit={handleSubmitFile} className="form">
                 <Button
                     sx={{ mt: 1, mb: 2 }}
@@ -249,6 +259,7 @@ const Samples = (props) => {
                     Generate recognition
                 </Button>
             </div>
+            <AlertMsg msg={infoSuccessMsg} type="success" />
         </div>
     );
 };
