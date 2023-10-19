@@ -3,7 +3,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "axios"; 
 
 const AdminStatistics = () => {
     const [paginationModel, setPaginationModel] = useState({

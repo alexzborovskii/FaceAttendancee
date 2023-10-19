@@ -21,7 +21,7 @@ export default function InOutChart() {
     const [monthYear, setMonthYear] = useState(dateTime(new Date()));
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [chartData, setChartData] = useState();
+    const [chartData, setChartData] = useState([]);
 
     useEffect(() => {
         getLineData();

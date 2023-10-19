@@ -23,7 +23,7 @@ const {
     _getStatisticsByDay,
     _getStatisticsTotalByDay,
     _getStatisticsByUser,
-    _getStatisticsByUserAsc
+    _getStatisticsByUserAsc,
 } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -284,12 +284,19 @@ const getUserStatistics = async (req, res) => {
             const detection_id = row.detection_id;
             const user_id = row.user_id;
             const name = `${row.fname} ${row.lname}`;
-            const time = row.time.toLocaleTimeString("en-US", {
+            const time = row.time.toLocaleTimeString("en-Gb", {
                 hour12: false,
+                timeZone: "UTC",
             });
             const date = `${row.time.getFullYear()}-${
-                row.time.getMonth() + 1
-            }-${row.time.getDate()}`;
+                row.time.getMonth("en-Gb", {
+                    hour12: false,
+                    timeZone: "UTC",
+                }) + 1
+            }-${row.time.getDate("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            })}`;
 
             return { detection_id, user_id, name, date, time };
         });
@@ -324,12 +331,19 @@ const getAdminStatistics = async (req, res) => {
             const detection_id = row.detection_id;
             const user_id = row.user_id;
             const name = `${row.fname} ${row.lname}`;
-            const time = row.time.toLocaleTimeString("en-US", {
+            const time = row.time.toLocaleTimeString("en-Gb", {
                 hour12: false,
+                timeZone: "UTC",
             });
             const date = `${row.time.getFullYear()}-${
-                row.time.getMonth() + 1
-            }-${row.time.getDate()}`;
+                row.time.getMonth("en-Gb", {
+                    hour12: false,
+                    timeZone: "UTC",
+                }) + 1
+            }-${row.time.getDate("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            })}`;
 
             return { detection_id, user_id, name, date, time };
         });
@@ -554,7 +568,7 @@ const getStatisticsByDay = async (req, res) => {
         });
     }
 };
- 
+
 const getStatisticsByUser = async (req, res) => {
     try {
         const user_id = req.user.userId;
@@ -686,15 +700,25 @@ const getLineData = async (req, res) => {
             }
         });
 
-        const firstTime = statisticsByUser.map((date) => new Date("Wed, 18 Oct 2023 " + date.first_time+"Z").getTime());
-        const lastTime = statisticsByUser.map((date) => new Date("Wed, 18 Oct 2023 " + date.last_time+"Z").getTime());
-        const officialStart = Array(firstTime.length).fill(new Date("Wed, 18 Oct 2023 " + "9:00:00"+"Z").getTime())
-        const officialEnd = Array(firstTime.length).fill(new Date("Wed, 18 Oct 2023 " + "18:00:00"+"Z").getTime())
+        const firstTime = statisticsByUser.map((date) =>
+            new Date("Wed, 18 Oct 2023 " + date.first_time + "Z").getTime()
+        );
+        const lastTime = statisticsByUser.map((date) =>
+            new Date("Wed, 18 Oct 2023 " + date.last_time + "Z").getTime()
+        );
+        const officialStart = Array(firstTime.length).fill(
+            new Date("Wed, 18 Oct 2023 " + "9:00:00" + "Z").getTime()
+        );
+        const officialEnd = Array(firstTime.length).fill(
+            new Date("Wed, 18 Oct 2023 " + "18:00:00" + "Z").getTime()
+        );
 
-        const dates = statisticsByUser.map((date) => date.date.substring(8, 11));
+        const dates = statisticsByUser.map((date) =>
+            date.date.substring(8, 11)
+        );
 
         res.status(200).json({
-            data: {firstTime, lastTime, dates, officialStart, officialEnd},
+            data: { firstTime, lastTime, dates, officialStart, officialEnd },
             total: statisticsByUser.length,
         });
     } catch (error) {
@@ -703,7 +727,7 @@ const getLineData = async (req, res) => {
             msg: "Something went wrong. Cant get statistcs by day",
         });
     }
-}
+};
 const getTimeSpentData = async (req, res) => {
     try {
         const user_id = req.user.userId;
@@ -762,11 +786,19 @@ const getTimeSpentData = async (req, res) => {
                 }
             }
         });
-        const timeValue = statisticsByUser.map((date) => Math.floor((new Date(date.last_time).getTime() - new Date(date.first_time).getTime())/ (1000*60)))
-        const dates = statisticsByUser.map((date) => date.date.substring(8, 11))
+        const timeValue = statisticsByUser.map((date) =>
+            Math.floor(
+                (new Date(date.last_time).getTime() -
+                    new Date(date.first_time).getTime()) /
+                    (1000 * 60)
+            )
+        );
+        const dates = statisticsByUser.map((date) =>
+            date.date.substring(8, 11)
+        );
 
         res.status(200).json({
-            data: {timeValue, dates},
+            data: { timeValue, dates },
             total: statisticsByUser.length,
         });
     } catch (error) {
@@ -775,7 +807,7 @@ const getTimeSpentData = async (req, res) => {
             msg: "Something went wrong. Cant get statistcs by day",
         });
     }
-}
+};
 
 module.exports = {
     register,
@@ -800,5 +832,4 @@ module.exports = {
     getStatisticsByUser,
     getLineData,
     getTimeSpentData,
-
 };

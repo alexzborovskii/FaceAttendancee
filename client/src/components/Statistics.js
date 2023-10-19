@@ -66,7 +66,7 @@ const Statistics = () => {
             flex: 1,
         },
     ];
-
+ 
     return (
         <Box m="10px">
             <Box

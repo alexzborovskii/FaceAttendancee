@@ -68,7 +68,7 @@ const AdminByDayStatistics = () => {
             console.log(e);
         }
     };
-
+ 
     const getAdminByUserStatistics = async (event) => {
         try {
             setIdentifier("index");
