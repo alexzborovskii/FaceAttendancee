@@ -55,10 +55,11 @@ const login = async (req, res) => {
         //successful login
         const userId = row[0].user_id;
         const email = row[0].email;
+        const admin = row[0].admin
         // my secret
         const secret = process.env.ACCESS_TOKEN_SECRET;
         //token
-        const accessToken = jwt.sign({ userId, email }, secret, {
+        const accessToken = jwt.sign({ userId, email, admin }, secret, {
             expiresIn: "60m",
         });
         //server cookies
@@ -728,9 +729,179 @@ const getLineData = async (req, res) => {
         });
     }
 };
+
 const getTimeSpentData = async (req, res) => {
     try {
         const user_id = req.user.userId;
+        //create date borders
+        const month_year = req.query.monthYear;
+        const endOfTheMonth = new Date(
+            month_year.substring(0, 11) + "23:59:59.000Z"
+        );
+
+        const currDate = new Date(month_year);
+        let firstDay = new Date(currDate.getFullYear(), currDate.getMonth(), 2);
+        let lastDay = new Date(
+            endOfTheMonth.getFullYear(),
+            endOfTheMonth.getMonth() + 1,
+            0
+        );
+        const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
+        const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
+        //get data
+        const data = await _getStatisticsByUser({
+            user_id,
+            start,
+            end,
+        });
+        // clean and structure the data
+        let statisticsByUser = [];
+        let rowIndex = 1;
+        data.forEach((row) => {
+            let newRow = {};
+
+            const time = row.time.toLocaleTimeString("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            });
+            const date = row.time.toISOString().substring(0, 10);
+
+            const index = statisticsByUser.findIndex(
+                (item) => date === item.date
+            );
+
+            if (index === -1) {
+                newRow.index = rowIndex;
+                newRow.first_time = row.time;
+                newRow.last_time = row.time;
+                newRow.date = date;
+                newRow.name = `${row.fname} ${row.lname}`;
+                newRow.user_id = row.user_id;
+                statisticsByUser.push(newRow);
+                rowIndex++;
+            } else {
+                if (statisticsByUser[index].last_time < row.time) {
+                    statisticsByUser[index].last_time = row.time;
+                }
+                if (statisticsByUser[index].first_time > row.time) {
+                    statisticsByUser[index].first_time = row.time;
+                }
+            }
+        });
+        const timeValue = statisticsByUser.map((date) =>
+            Math.floor(
+                (new Date(date.last_time).getTime() -
+                    new Date(date.first_time).getTime()) /
+                    (1000 * 60)
+            )
+        );
+        const dates = statisticsByUser.map((date) =>
+            date.date.substring(8, 11)
+        );
+
+        res.status(200).json({
+            data: { timeValue, dates },
+            total: statisticsByUser.length,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get statistcs by day",
+        });
+    }
+};
+
+const getAdminLineData = async (req, res) => {
+    try {
+        const user_id = req.query.userId;
+        //create date borders
+        const month_year = req.query.monthYear;
+        const endOfTheMonth = new Date(
+            month_year.substring(0, 11) + "23:59:59.000Z"
+        );
+
+        const currDate = new Date(month_year);
+        let firstDay = new Date(currDate.getFullYear(), currDate.getMonth(), 2);
+        let lastDay = new Date(
+            endOfTheMonth.getFullYear(),
+            endOfTheMonth.getMonth() + 1,
+            0
+        );
+        const start = firstDay.toISOString().substring(0, 11) + "00:00:00.000Z";
+        const end = lastDay.toISOString().substring(0, 11) + "23:59:59.999Z";
+        //get data
+        const data = await _getStatisticsByUserAsc({
+            user_id,
+            start,
+            end,
+        });
+        // clean and structure the data
+        let statisticsByUser = [];
+        let rowIndex = 1;
+        data.forEach((row) => {
+            let newRow = {};
+
+            const time = row.time.toLocaleTimeString("en-Gb", {
+                hour12: false,
+                timeZone: "UTC",
+            });
+            const date = row.time.toISOString().substring(0, 10);
+
+            const index = statisticsByUser.findIndex(
+                (item) => date === item.date
+            );
+
+            if (index === -1) {
+                newRow.index = rowIndex;
+                newRow.first_time = time;
+                newRow.last_time = time;
+                newRow.date = date;
+                newRow.name = `${row.fname} ${row.lname}`;
+                newRow.user_id = row.user_id;
+                statisticsByUser.push(newRow);
+                rowIndex++;
+            } else {
+                if (statisticsByUser[index].last_time < time) {
+                    statisticsByUser[index].last_time = time;
+                }
+                if (statisticsByUser[index].first_time > time) {
+                    statisticsByUser[index].first_time = time;
+                }
+            }
+        });
+
+        const firstTime = statisticsByUser.map((date) =>
+            new Date("Wed, 18 Oct 2023 " + date.first_time + "Z").getTime()
+        );
+        const lastTime = statisticsByUser.map((date) =>
+            new Date("Wed, 18 Oct 2023 " + date.last_time + "Z").getTime()
+        );
+        const officialStart = Array(firstTime.length).fill(
+            new Date("Wed, 18 Oct 2023 " + "9:00:00" + "Z").getTime()
+        );
+        const officialEnd = Array(firstTime.length).fill(
+            new Date("Wed, 18 Oct 2023 " + "18:00:00" + "Z").getTime()
+        );
+
+        const dates = statisticsByUser.map((date) =>
+            date.date.substring(8, 11)
+        );
+
+        res.status(200).json({
+            data: { firstTime, lastTime, dates, officialStart, officialEnd,  },
+            total: statisticsByUser.length,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(404).json({
+            msg: "Something went wrong. Cant get statistcs by day",
+        });
+    }
+};
+
+const getAdminTimeSpentData = async (req, res) => {
+    try {
+        const user_id = req.query.userId;
         //create date borders
         const month_year = req.query.monthYear;
         const endOfTheMonth = new Date(
@@ -832,4 +1003,6 @@ module.exports = {
     getStatisticsByUser,
     getLineData,
     getTimeSpentData,
+    getAdminLineData,
+    getAdminTimeSpentData,
 };

@@ -18,6 +18,9 @@ import AdminByDayStatistics from "./components/AdminByDayStatistics.js";
 import StatisticsByDay from "./components/StatisticsByDay.js";
 import InOutChart from "./components/InOutChart.js";
 import TimeSpentChart from "./components/TimeSpentChart.js";
+import { AdminCheck } from "./auth/AdminCheck.js";
+import Charts from "./components/Charts.js";
+import AdminCharts from "./components/AdminCharts.js";
 export const AppContext = createContext(null);
 
 function App() {
@@ -62,6 +65,22 @@ function App() {
                                         }
                                     />
                                     <Route
+                                        path="/charts"
+                                        element={
+                                            <Auth>
+                                                <Charts />
+                                            </Auth>
+                                        }
+                                    />
+                                    <Route
+                                        path="/adminCharts"
+                                        element={
+                                            <AdminCheck>
+                                                <AdminCharts />
+                                            </AdminCheck>
+                                        }
+                                    />
+                                    <Route
                                         path="/statistics"
                                         element={
                                             <Auth>
@@ -80,17 +99,17 @@ function App() {
                                     <Route
                                         path="/adminStatistics"
                                         element={
-                                            <Auth>
+                                            <AdminCheck>
                                                 <AdminStatistics />{" "}
-                                            </Auth>
+                                            </AdminCheck>
                                         }
                                     />
                                     <Route
                                         path="/adminByDayStatistics"
                                         element={
-                                            <Auth>
+                                            <AdminCheck>
                                                 <AdminByDayStatistics />{" "}
-                                            </Auth>
+                                            </AdminCheck>
                                         }
                                     />
                                     <Route

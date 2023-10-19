@@ -66,7 +66,7 @@ const Statistics = () => {
             flex: 1,
         },
     ];
- 
+
     return (
         <Box m="10px">
             <Box
@@ -118,7 +118,7 @@ const Statistics = () => {
                             },
                         },
                     }}
-                    pageSizeOptions={[10, 30, 50, 70, 100,]}
+                    pageSizeOptions={[10, 25, 50, 100]}
                     pagination
                     page={paginationModel.page}
                     pageSize={paginationModel.pageSize}

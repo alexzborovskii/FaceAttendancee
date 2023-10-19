@@ -32,8 +32,8 @@ const AdminByDayStatistics = () => {
     const [monthYear, setMonthYear] = useState(dateTime(new Date()));
     const [userLabels, setUserLabels] = useState([]);
     const [identifier, setIdentifier] = useState("user_id");
-    const [pageSizeArrayState, setPageSizeArrayState] = useState([])
     let source = "date";
+    
     useEffect(() => {
         getUserLabels();
     }, []);
@@ -48,10 +48,8 @@ const AdminByDayStatistics = () => {
     
     useEffect(() => {
         if (source === "date") {
-            setPageSizeArrayState([]);
             getAdminByDayStatistics();
         } else if (source === "user") {
-            setPageSizeArrayState([]);
             getAdminByUserStatistics();
         }
     }, [
@@ -177,9 +175,6 @@ const AdminByDayStatistics = () => {
                             value={user}
                             label="User"
                             onChange={(e) => setUser(e.target.value)}>
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
                             {userLabels &&
                                 userLabels.map((label, index) => {
                                     return (

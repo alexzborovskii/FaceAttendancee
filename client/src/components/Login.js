@@ -20,25 +20,8 @@ import { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import AlertMsg from "./Alert";
 import { AppContext } from "../App";
+import Copyright from "./Copyright";
 
-function Copyright(props) {
-    return (
-        <Typography
-            variant="body2"
-            color="text.secondary"
-            align="center"
-            {...props}>
-            {"Copyright © "}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    );
-}
-
-// TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
@@ -152,10 +135,6 @@ export default function SignInSide() {
                                     setPassword(e.target.value);
                                 }}
                             />
-                            {/* <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              /> */}
                             <Button
                                 type="submit"
                                 fullWidth
@@ -171,9 +150,6 @@ export default function SignInSide() {
 
                             <Grid container>
                                 <Grid item xs>
-                                    {/* <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link> */}
                                 </Grid>
                                 <Grid item>
                                     <ReactLink to="/register">

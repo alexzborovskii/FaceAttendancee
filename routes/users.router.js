@@ -20,7 +20,9 @@ const {
     getStatisticsByDay,
     getStatisticsByUser,
     getLineData,
-    getTimeSpentData
+    getTimeSpentData,
+    getAdminLineData,
+    getAdminTimeSpentData
 } = require("../controllers/users.controllers.js");
 const express = require("express");
 const u_router = express.Router();
@@ -28,7 +30,10 @@ const {verifyToken} = require('../middlewares/verify.token.js');
 
 
 u_router.get("/verify", verifyToken, (req, res) => {
-    res.sendStatus(200); 
+    res.status(200).json({admin: req.user.admin}); 
+});
+u_router.get("/getId", verifyToken, (req, res) => {
+    res.status(200).json({user_id : req.user.userId}); 
 });
 
 u_router.post("/register", register);
@@ -53,6 +58,8 @@ u_router.get("/StatisticsByDay/", verifyToken, getStatisticsByDay)
 u_router.get("/StatisticsByUser/", verifyToken, getStatisticsByUser) 
 u_router.get("/LineData/", verifyToken, getLineData) 
 u_router.get("/timeSpentData/", verifyToken, getTimeSpentData) 
+u_router.get("/adminLineData/", verifyToken, getAdminLineData) 
+u_router.get("/adminTimeSpentData/", verifyToken, getAdminTimeSpentData) 
 
 
 module.exports = {

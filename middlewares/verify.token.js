@@ -18,7 +18,7 @@ const verifyToken = (req, res, next) => {
         const secret = process.env.ACCESS_TOKEN_SECRET;
         //token
         const accessToken = jwt.sign(
-            { userId: decode.userId, email: decode.email },
+            { userId: decode.userId, email: decode.email, admin: decode.admin },
             secret,
             {
                 expiresIn: "60m",

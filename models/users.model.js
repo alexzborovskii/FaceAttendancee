@@ -9,7 +9,7 @@ const _register = (lname, fname, email, password) => {
 };
 
 const _login = (email) => {
-    return db("users").select("user_id", "email", "password").where({ email });
+    return db("users").select("user_id", "email", "password", "admin").where({ email });
 };
 
 const _getPassword = ({ user_id }) => {

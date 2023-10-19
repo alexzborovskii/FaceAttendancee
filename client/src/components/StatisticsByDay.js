@@ -24,7 +24,6 @@ const StatisticsByDay = () => {
     const [monthYear, setMonthYear] = useState(dateTime(new Date()));
     const [userLabels, setUserLabels] = useState([]);
     const [identifier, setIdentifier] = useState("user_id");
-    // const [pageSizeArrayState, setPageSizeArrayState] = useState([]);
     let source = "date";
     useEffect(() => {
         getUserLabels();

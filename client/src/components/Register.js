@@ -20,7 +20,6 @@ import AlertMsg from "./Alert";
 import { AppContext } from "../App";
 import Copyright from "./Copyright.js";
 
-// TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 

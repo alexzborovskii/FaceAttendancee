@@ -1,19 +1,21 @@
 import * as React from "react";
+import {useState} from "react"
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import Link from "@mui/material/Link";
 import { useTheme } from "@mui/material";
-import AccountScreen from "./AccountScreen";
-import Samples from "./Samples";
 import Copyright from "./Copyright.js"
+import TimeSpentChart from "./TimeSpentChart";
+import InOutChart from "./InOutChart";
 
 
 
-const AccountDashboard = () => {
+const Charts = () => {
     const theme = useTheme();
+    const [timeSpentChartHeight, setSpentTimeChartHeight] = useState("30vh");
+    const [inOutChartHeight, setInOutChartHeight] = useState("30vh");
+
 
     return (
             <Box sx={{ display: "flex" }}>
@@ -28,10 +30,10 @@ const AccountDashboard = () => {
                         height: "calc(100vh - 75.43px)",
                         overflow: "auto",
                     }}>
-                    <Container maxWidth={false} sx={{ mt: 4, mb: 4 }} >
-                        <Grid container spacing={3}>
-                            {/* AccountScreen */}
-                            <Grid item xs={12} md={6} lg={4}>
+                    <Container maxWidth={false} sx={{ mt: 1, mb: 1 }} >
+                        <Grid container spacing={2}>
+                            {/* SpentTimeChart */}
+                            <Grid item xs={12} >
                                 <Paper
                                     sx={{
                                         p: 2,
@@ -39,11 +41,11 @@ const AccountDashboard = () => {
                                         flexDirection: "column",
                                         height: "fitcontent",
                                     }}>
-                                    <AccountScreen />
+                                    <TimeSpentChart height={timeSpentChartHeight}/>
                                 </Paper>
                             </Grid>
-                            {/* Samples */}
-                            <Grid item xs={12} md={6} lg={8}>
+                            {/* InOutChart */}
+                            <Grid item xs={12}>
                                 <Paper
                                     sx={{
                                         p: 2,
@@ -51,15 +53,14 @@ const AccountDashboard = () => {
                                         flexDirection: "column",
                                         height: "fitcontent",
                                     }}>
-                                    <Samples />
+                                    <InOutChart height={inOutChartHeight}/>
                                 </Paper>
                             </Grid>
                         </Grid>
-                        {/* <Copyright sx={{ pt: 4 }} /> */}
                     </Container>
                 </Box>
             </Box>
     );
 };
 
-export default AccountDashboard;
+export default Charts;
