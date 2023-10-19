@@ -6,8 +6,8 @@ import { Box, CardMedia } from "@mui/material";
 
 export default function NoDataMessage() {
     return (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <Card sx={{ width: 400 }}>
+        <Box sx={{ display: "flex", justifyContent: "center",  }}>
+            <Card variant="outlined" sx={{ width: 400, borderRadius: "20px", background: "rgba(0,0,0,0)"}}>
                 <CardMedia
                     sx={{ height: 400 }}
                     image="../../no_data.png"

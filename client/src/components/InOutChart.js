@@ -21,7 +21,7 @@ export default function InOutChart() {
     const [monthYear, setMonthYear] = useState(dateTime(new Date()));
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [chartData, setChartData] = useState([]);
+    const [chartData, setChartData] = useState("default");
 
     useEffect(() => {
         getLineData();
@@ -39,7 +39,7 @@ export default function InOutChart() {
             const dates = data.dates;
             const officialStart = data.officialStart;
             const officialEnd = data.officialEnd;
-            if (dates.length) 
+            if (dates.length) {
                 setChartData({
                     firstTime,
                     lastTime,
@@ -47,6 +47,9 @@ export default function InOutChart() {
                     officialStart,
                     officialEnd,
                 });
+            } else {
+                setChartData("empty");
+            }
         } catch (e) {
             console.log(e);
         }
@@ -54,7 +57,6 @@ export default function InOutChart() {
 
     return (
         <Box m="20px">
-            {chartData ? (
                 <Box height="75vh">
                     <LocalizationProvider
                         dateAdapter={AdapterDayjs}
@@ -73,6 +75,9 @@ export default function InOutChart() {
                         />
                     </LocalizationProvider>
 
+                    {chartData === "default" ? null : chartData === "empty" ? (
+                        <NoDataMessage />
+                    ) : (
                     <LineChart
                         series={[
                             {
@@ -113,10 +118,8 @@ export default function InOutChart() {
                         ]}
                         leftAxis={null}
                     />
+                    )}
                 </Box>
-            ) : (
-                <NoDataMessage />
-            )}
         </Box>
     );
 }

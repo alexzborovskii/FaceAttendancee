@@ -21,7 +21,7 @@ export default function TimeSpentChart() {
     const [monthYear, setMonthYear] = useState(dateTime(new Date()));
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [chartData, setChartData] = useState();
+    const [chartData, setChartData] = useState("default");
 
     useEffect(() => {
         getCharData();
@@ -36,7 +36,11 @@ export default function TimeSpentChart() {
             const total = res.data.total;
             const timeValue = data.timeValue;
             const dates = data.dates;
-            if (dates.length) setChartData({ timeValue, dates });
+            if (dates.length) {
+                setChartData({ timeValue, dates });
+            } else {
+                setChartData("empty");
+            }
         } catch (e) {
             console.log(e);
         }
@@ -45,27 +49,28 @@ export default function TimeSpentChart() {
     const timeToHours = (data) =>
         Math.floor(data / 60) + ":" + (data % 60) + "h";
 
-        return (
-            
-            <Box m="20px">
-            {chartData ? (
-            <Box height="75vh">
-                <LocalizationProvider
-                    dateAdapter={AdapterDayjs}
-                    components={["DatePicker"]}>
-                    <DatePicker
-                        sx={{ m: 1 }}
-                        label={'Month and year"'}
-                        views={["month", "year"]}
-                        defaultValue={dayjs(date)}
-                        autoOk={true}
-                        hintText="Select Month"
-                        value={dayjs(date)}
-                        onChange={(e) => {
-                            setMonthYear(e.$d.toISOString());
-                        }}
-                    />
-                </LocalizationProvider>
+    return (
+        <Box m="20px">
+                <Box height="75vh">
+                    <LocalizationProvider
+                        dateAdapter={AdapterDayjs}
+                        components={["DatePicker"]}>
+                        <DatePicker
+                            sx={{ m: 1 }}
+                            label={'Month and year"'}
+                            views={["month", "year"]}
+                            defaultValue={dayjs(date)}
+                            autoOk={true}
+                            hintText="Select Month"
+                            value={dayjs(date)}
+                            onChange={(e) => {
+                                setMonthYear(e.$d.toISOString());
+                            }}
+                        />
+                    </LocalizationProvider>
+                                {chartData === "default" ? null : chartData === "empty" ? (
+                                    <NoDataMessage />
+                                ) : (
                     <BarChart
                         series={[
                             {
@@ -87,8 +92,8 @@ export default function TimeSpentChart() {
                             },
                         ]}
                     />
-            </Box>
-                ) : <NoDataMessage />}
+                    )}
+                </Box>
         </Box>
     );
 }
