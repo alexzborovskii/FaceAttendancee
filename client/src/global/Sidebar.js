@@ -120,7 +120,8 @@ const Sidebar = (props) => {
                         <Typography
                             variant="h6"
                             color={colors.grey[300]}
-                            sx={{ m: "5px 0 5px 20px" }}>
+                            // sx={{ m: "5px 0 5px 20px" }}
+                            >
                             Statistics
                         </Typography>
                         <AdminCheck>
@@ -156,7 +157,8 @@ const Sidebar = (props) => {
                         <Typography
                             variant="h6"
                             color={colors.grey[300]}
-                            sx={{ m: "5px 0 5px 20px" }}>
+                            // sx={{ m: "5px 0 5px 20px" }}
+                            >
                             Charts
                         </Typography>
                         <Item
